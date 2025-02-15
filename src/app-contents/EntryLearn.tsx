@@ -4,10 +4,10 @@ import {
 	SchemaDataRowParented,
 	useSchemaQuery,
 } from './api-calls';
-import DataList from './info/DataList';
 
 import { ReactElement } from 'react';
 import { SongCells } from './info/Song';
+import { DataList } from '@pandazy/jankenstore-client-web';
 
 export default function EntryLearn(): ReactElement {
 	const { data, isLoading } = useSchemaQuery(

@@ -4,7 +4,7 @@ import { useSearchContext } from './SearchContext';
 import { ReactElement, useState } from 'react';
 import Frame from './Frame';
 import { Radio, FormControlLabel, RadioGroup, Stack } from '@mui/material';
-import { SearchList } from './info/DataList';
+import { SearchList } from './info/SearchList';
 import { ShowCells } from './info/Show';
 import { ArtistCells } from './info/Artist';
 import { SongCells } from './info/Song';

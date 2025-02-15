@@ -1,12 +1,14 @@
 import { getRandomColor } from './utils';
 import { peers, SchemaDataRowParented } from '../api-calls';
 import { ShowCells } from './Show';
-import PopButton from './PopButton';
-import { PopCardList } from './PopCard';
-import Piece from './Piece';
 import { ArtistPopCard } from './Artist';
 
-import { SchemaDataRow } from '@pandazy/jankenstore-client-web';
+import {
+	Piece,
+	PopButton,
+	PopCardList,
+	SchemaDataRow,
+} from '@pandazy/jankenstore-client-web';
 
 import { ReactElement } from 'react';
 import {
@@ -37,7 +39,11 @@ function ShowList({ song }: { song: SchemaDataRowParented }) {
 				<>
 					<span>Shows of </span>
 					<b>
-						<Piece table="song" srcRow={song} col="name" />
+						<Piece
+							table="song"
+							srcRow={song as SchemaDataRow}
+							col="name"
+						/>
 					</b>
 				</>
 			}
@@ -73,7 +79,13 @@ export function SongCells({
 				</Avatar>
 				<ListItemText
 					sx={{ ml: 2 }}
-					primary={<Piece table="song" srcRow={song} col="name" />}
+					primary={
+						<Piece
+							table="song"
+							srcRow={song as SchemaDataRow}
+							col="name"
+						/>
+					}
 				/>
 				{relatedType !== 'artist' && <ArtistOfSong song={song} />}
 

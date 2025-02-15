@@ -1,13 +1,15 @@
 import { getRandomColor } from './utils';
-import PopButton from './PopButton';
 import { peers, useSchemaQuery } from '../api-calls';
 import { SongCells } from './Song';
 import { ReactElement } from 'react';
-import { PopCardList } from './PopCard';
-import Piece from './Piece';
 
-import { useSchemaPk, SchemaDataRow } from '@pandazy/jankenstore-client-web';
-
+import {
+	useSchemaPk,
+	SchemaDataRow,
+	PopButton,
+	Piece,
+	PopCardList,
+} from '@pandazy/jankenstore-client-web';
 import { Movie, MusicNote, YouTube } from '@mui/icons-material';
 import { Stack, ListItemText, Avatar, IconButton, Alert } from '@mui/material';
 

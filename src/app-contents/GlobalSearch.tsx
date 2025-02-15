@@ -1,6 +1,6 @@
 import { useSearchContext } from './SearchContext';
 
-import DebouncedTextField from '@pandazy/jankenstore-client-web/dist/crud-ui/DebouncedTextField';
+import { DebouncedTextField } from '@pandazy/jankenstore-client-web';
 import { ReactElement } from 'react';
 import { FormControlLabel, Switch } from '@mui/material';
 

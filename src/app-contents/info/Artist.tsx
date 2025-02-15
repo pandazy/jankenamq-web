@@ -1,16 +1,20 @@
 import { SongCells } from './Song';
 import { getRandomColor } from './utils';
-import PopButton from './PopButton';
+
 import {
 	byIds,
 	children,
 	SchemaDataRowParented,
 	useSchemaQuery,
 } from '../api-calls';
-import { PopCardList } from './PopCard';
-import Piece from './Piece';
 
-import { SchemaDataRow, useSchemaPk } from '@pandazy/jankenstore-client-web';
+import {
+	Piece,
+	PopButton,
+	PopCardList,
+	SchemaDataRow,
+	useSchemaPk,
+} from '@pandazy/jankenstore-client-web';
 
 import { MusicNote, Person, YouTube } from '@mui/icons-material';
 import {
@@ -47,7 +51,11 @@ function SongListOfArtist({
 				<>
 					<span>Songs by </span>
 					<b>
-						<Piece table="artist" srcRow={artist} col="name" />
+						<Piece
+							table="artist"
+							srcRow={artist as SchemaDataRow}
+							col="name"
+						/>
 					</b>
 				</>
 			}
@@ -80,7 +88,11 @@ export function ArtistCells({
 				</ListItemAvatar>
 				<ListItemText
 					primary={
-						<Piece table="artist" srcRow={artist} col="name" />
+						<Piece
+							table="artist"
+							srcRow={artist as SchemaDataRow}
+							col="name"
+						/>
 					}
 				/>
 				{relatedType !== 'song' && (

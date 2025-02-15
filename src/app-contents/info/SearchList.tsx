@@ -1,34 +1,8 @@
-import AnimatedLoadingBar from './AnimatedLoadingBar';
 import { all, useSchemaQuery } from '../api-calls';
 import { search } from '../api-calls';
 
-import { Divider, List, ListItem } from '@mui/material';
 import { ReactElement, ReactNode } from 'react';
-import { SchemaDataRow } from '@pandazy/jankenstore-client-web';
-
-export interface DataListProps<T = SchemaDataRow> {
-	data: T[];
-	makeItemContent: (item: T) => ReactNode;
-	isLoading: boolean;
-}
-
-export default function DataList<T>({
-	data,
-	isLoading,
-	makeItemContent,
-}: DataListProps<T>) {
-	return (
-		<List sx={{ p: 0 }}>
-			<AnimatedLoadingBar isLoading={isLoading} />
-			{(data ?? []).map((item, i) => (
-				<div key={i}>
-					<Divider />
-					<ListItem>{makeItemContent(item)}</ListItem>
-				</div>
-			))}
-		</List>
-	);
-}
+import { DataList, SchemaDataRow } from '@pandazy/jankenstore-client-web';
 
 export interface SearchListProps {
 	source: [string, string];
