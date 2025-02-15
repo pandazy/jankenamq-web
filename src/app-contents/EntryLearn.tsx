@@ -24,7 +24,7 @@ export default function EntryLearn(): ReactElement {
 		<Frame forRoute="learn">
 			<h1>Learning songs</h1>
 			<DataList
-				data={data ?? []}
+				data={data?.records ?? []}
 				isLoading={isLoading}
 				makeItemContent={(item: SchemaDataRowParented) => {
 					return (

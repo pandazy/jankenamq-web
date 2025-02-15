@@ -34,7 +34,7 @@ export function SearchList({
 	);
 	return (
 		<DataList
-			data={(data ?? []) as SchemaDataRow[]}
+			data={(data?.records ?? []) as SchemaDataRow[]}
 			isLoading={isLoading}
 			makeItemContent={makeCell}
 		/>

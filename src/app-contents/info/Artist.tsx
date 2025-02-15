@@ -34,7 +34,10 @@ function SongListOfArtist({
 	table: string;
 	artist: SchemaDataRowParented;
 }) {
-	const { pk, error, hasError } = useSchemaPk(table, artist as SchemaDataRow);
+	const { pk, error, hasError } = useSchemaPk<string>(
+		table,
+		artist as SchemaDataRow,
+	);
 	const { data, isLoading } = useQuery({
 		queryKey: ['song', 'artist', pk ?? ''],
 		queryFn: () => children('song', 'artist', pk ?? '', 20),
@@ -59,7 +62,7 @@ function SongListOfArtist({
 					</b>
 				</>
 			}
-			data={data ?? []}
+			data={data?.records ?? []}
 			isLoading={isLoading}
 			makeItemContent={(item: SchemaDataRowParented) => (
 				<SongCells song={item} from={['artist', artist]} />
@@ -147,7 +150,7 @@ export function ArtistPopCard({
 			queryFn: () => byIds('artist', [artistId]),
 		},
 	);
-	const artist = data?.[0];
+	const artist = data?.records[0];
 	if (!artist) {
 		return <Alert severity="error">Artist not found</Alert>;
 	}
@@ -169,7 +172,7 @@ export function ArtistPopCard({
 					)}
 				</>
 			}
-			data={(data ?? []) as SchemaDataRow[]}
+			data={(data?.records ?? []) as SchemaDataRow[]}
 			isLoading={isLoading}
 			makeItemContent={(item: SchemaDataRow) => (
 				<ArtistCells

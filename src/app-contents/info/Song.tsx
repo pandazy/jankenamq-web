@@ -47,7 +47,7 @@ function ShowList({ song }: { song: SchemaDataRowParented }) {
 					</b>
 				</>
 			}
-			data={data ?? []}
+			data={data?.records ?? []}
 			isLoading={isLoading}
 			makeItemContent={(item: SchemaDataRowParented) => (
 				<ShowCells

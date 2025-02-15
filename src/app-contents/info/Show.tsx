@@ -64,15 +64,19 @@ export interface ShowCellsProps {
 }
 
 export function SongListOfShow({ show }: { show: SchemaDataRow }) {
-	const { pk, error, hasError } = useSchemaPk('show', show as SchemaDataRow);
+	const {
+		pk: showPk,
+		error,
+		hasError,
+	} = useSchemaPk<string>('show', show as SchemaDataRow);
 	const { data, isLoading } = useSchemaQuery(
 		{
 			table: 'song',
 			fillParent: true,
 		},
 		{
-			queryKey: ['show', 'song', show.id],
-			queryFn: () => peers('song', { show: [pk ?? ''] }, 20),
+			queryKey: ['show', 'song', showPk],
+			queryFn: () => peers('song', { show: [showPk ?? ''] }, 20),
 		},
 	);
 	if (hasError) {
@@ -89,7 +93,7 @@ export function SongListOfShow({ show }: { show: SchemaDataRow }) {
 						</b>
 					</>
 				}
-				data={(data ?? []) as SchemaDataRow[]}
+				data={(data?.records ?? []) as SchemaDataRow[]}
 				isLoading={isLoading}
 				makeItemContent={(item) => (
 					<SongCells song={item} from={['show', show]} />

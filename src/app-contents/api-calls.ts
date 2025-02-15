@@ -15,6 +15,8 @@ const CommonHeaders = {
 	'Content-Type': 'application/json',
 };
 
+export type RecordsWithTotal<T> = { records: T[]; total: number };
+
 export interface SchemaDataRowParented
 	extends Record<
 		string,
@@ -36,20 +38,20 @@ export function useSchemaQuery(
 		table: string;
 		fillParent?: boolean;
 	},
-	query: UseQueryOptions<SchemaDataRowParented[]> = {
+	query: UseQueryOptions<RecordsWithTotal<SchemaDataRowParented>> = {
 		queryKey: ['query', basicFetchOptions.table],
 	},
-): UseQueryResult<SchemaDataRowParented[]> {
-	const { verifyTable, parents: schemaParents, pkField } = useSchemaChecks();
+): UseQueryResult<RecordsWithTotal<SchemaDataRowParented>> {
+	const { verifyTable, parentNames, pkField } = useSchemaChecks();
 	const { table, fillParent } = basicFetchOptions;
 	const verifyTableResult = verifyTable(table);
-	const parentTypes = schemaParents(table);
+	const parentTypes = parentNames(table);
 	const queryFn = async () => {
 		const inputQueryFn = query.queryFn as unknown as () => Promise<
-			SchemaDataRow[]
+			RecordsWithTotal<SchemaDataRowParented>
 		>;
-		const result = await inputQueryFn();
-		const parentedResult = result.map((row) => ({
+		const originalResult = await inputQueryFn();
+		const parentedResult = originalResult.records.map((row) => ({
 			...row,
 			...(fillParent && parentTypes.length > 0
 				? {
@@ -60,8 +62,13 @@ export function useSchemaQuery(
 		if (fillParent && parentTypes.length > 0) {
 			for (const parentType of parentTypes) {
 				const fk = `${parentType}_${pkField(parentType).unwrap()}`;
-				const parentIds = result.map((row) => row[fk] as string);
-				const parentRows = await byIds(parentType, parentIds);
+				const parentIds = originalResult.records.map(
+					(row) => row[fk] as string,
+				);
+				const { records: parentRows } = await byIds(
+					parentType,
+					parentIds,
+				);
 				const parentRowsMap = parentRows.reduce((acc, parent) => {
 					acc[parent.id] = parent;
 					return acc;
@@ -74,7 +81,7 @@ export function useSchemaQuery(
 				});
 			}
 		}
-		return parentedResult;
+		return { records: parentedResult, total: originalResult.total };
 	};
 	const result = useQuery({
 		...query,
@@ -85,14 +92,14 @@ export function useSchemaQuery(
 		return {
 			isError: true,
 			error: new Error('queryFn is required by useSchemaQuery'),
-		} as UseQueryResult<SchemaDataRowParented[]>;
+		} as UseQueryResult<RecordsWithTotal<SchemaDataRowParented>>;
 	}
 	return verifyTableResult.isErr()
 		? ({
 				...result,
 				isError: true,
 				error: verifyTableResult.unwrapErr(),
-		  } as UseQueryResult<SchemaDataRowParented[]>)
+		  } as UseQueryResult<RecordsWithTotal<SchemaDataRowParented>>)
 		: result;
 }
 
@@ -101,7 +108,7 @@ export async function all(
 	limit = 10,
 	offset = 0,
 	orderBy = 'created_at desc',
-): Promise<Record<string, string>[]> {
+): Promise<RecordsWithTotal<SchemaDataRow>> {
 	const url = new URL(`${ADDR}/store_read`);
 	Object.entries({
 		op: JSON.stringify({
@@ -123,7 +130,7 @@ export async function all(
 export async function byIds(
 	table: string,
 	keys: string[],
-): Promise<Record<string, string>[]> {
+): Promise<{ records: Record<string, string>[]; total: number }> {
 	const url = new URL(`${ADDR}/store_read`);
 	Object.entries({
 		op: JSON.stringify({
@@ -151,7 +158,7 @@ export async function search(
 	limit = 10,
 	offset = 0,
 	orderBy = 'created_at desc',
-): Promise<SchemaDataRow[]> {
+): Promise<RecordsWithTotal<SchemaDataRow>> {
 	const url = new URL(`${ADDR}/store_read`);
 	Object.entries({
 		op: JSON.stringify({
@@ -177,7 +184,7 @@ export async function children(
 	limit = 10,
 	offset = 0,
 	orderBy = 'created_at desc',
-): Promise<Record<string, string>[]> {
+): Promise<RecordsWithTotal<SchemaDataRow>> {
 	const url = new URL(`${ADDR}/store_read`);
 	Object.entries({
 		op: JSON.stringify({
@@ -202,7 +209,7 @@ export async function peers(
 	limit = 10,
 	offset = 0,
 	orderBy = 'created_at desc',
-): Promise<Record<string, string>[]> {
+): Promise<{ records: Record<string, string>[]; total: number }> {
 	const url = new URL(`${ADDR}/store_read`);
 	Object.entries({
 		op: JSON.stringify({
@@ -225,7 +232,7 @@ export async function allLearnings(
 	orderBy: string = 'level,created_at desc',
 	limit: number = 10,
 	offset: number = 0,
-): Promise<Record<string, string>[]> {
+): Promise<RecordsWithTotal<SchemaDataRow>> {
 	const url = new URL(`${ADDR}/store_read`);
 	Object.entries({
 		op: JSON.stringify({
@@ -237,8 +244,9 @@ export async function allLearnings(
 	}).forEach(([key, value]) => {
 		url.searchParams.append(key, value.toString());
 	});
-	return await fetch(url, {
+	const res = await fetch(url, {
 		method: 'GET',
 		headers: CommonHeaders,
-	}).then((res) => res.json());
+	});
+	return await res.json();
 }
