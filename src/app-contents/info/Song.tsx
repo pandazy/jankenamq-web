@@ -34,6 +34,7 @@ import {
 } from '@mui/icons-material';
 import { getRandomColor } from './utils';
 import { useQuery } from '@tanstack/react-query';
+import { tooltipProps } from './utils-component';
 
 function ShowList({ song }: { song: SchemaDataRowParented }) {
 	const { data, isLoading } = useQuery({
@@ -84,7 +85,11 @@ function LearningSection({
 				<>
 					{Boolean(parseInt(learning.graduated as string)) && (
 						<>
-							<Tooltip title="You have learned this song">
+							<Tooltip
+								{...tooltipProps({
+									title: 'You have learned this song',
+								})}
+							>
 								<Chip
 									icon={
 										<SchoolOutlined
@@ -99,7 +104,11 @@ function LearningSection({
 									}}
 								/>
 							</Tooltip>
-							<Tooltip title="Re-learn this song">
+							<Tooltip
+								{...tooltipProps({
+									title: 'Re-learn this song',
+								})}
+							>
 								<Button
 									variant="outlined"
 									size="small"
@@ -112,9 +121,11 @@ function LearningSection({
 					)}
 					{!parseInt(learning.graduated as string) && (
 						<Tooltip
-							title={`You are learning this song at level ${
-								(learning?.level as number) + 1
-							}`}
+							{...tooltipProps({
+								title: `You are learning this song at level ${
+									(learning?.level as number) + 1
+								}`,
+							})}
 						>
 							<Chip
 								icon={<MilitaryTech sx={{ fill: 'white' }} />}
@@ -191,19 +202,14 @@ export function SongCells({
 
 				{relatedType !== 'show' && (
 					<PopButton
-						tooltipProps={{
-							slotProps: {
-								tooltip: {
-									sx: { whiteSpace: 'nowrap' },
-								},
-							},
+						tooltipProps={tooltipProps({
 							title: (
 								<>
 									Click to see related <b>shows</b> of the
 									song
 								</>
 							),
-						}}
+						})}
 						buttonProps={{
 							variant: 'outlined',
 							sx: { ml: 2 },
@@ -217,17 +223,14 @@ export function SongCells({
 			<Stack direction="row" alignItems="center">
 				{relatedType === 'artist' && (
 					<Tooltip
-						slotProps={{
-							tooltip: {
-								sx: { whiteSpace: 'nowrap' },
-							},
-						}}
-						title={
-							<>
-								Search the YouTube with the names of the{' '}
-								<b>artist</b> and the <b>song</b>
-							</>
-						}
+						{...tooltipProps({
+							title: (
+								<>
+									Search the YouTube with the names of the{' '}
+									<b>artist</b> and the <b>song</b>
+								</>
+							),
+						})}
 					>
 						<IconButton
 							component="a"
@@ -243,17 +246,14 @@ export function SongCells({
 
 				{relatedType === 'show' && (
 					<Tooltip
-						slotProps={{
-							tooltip: {
-								sx: { whiteSpace: 'nowrap' },
-							},
-						}}
-						title={
-							<>
-								Search the YouTube with the names of the{' '}
-								<b>show</b> and the <b>song</b>
-							</>
-						}
+						{...tooltipProps({
+							title: (
+								<>
+									Search the YouTube with the names of the{' '}
+									<b>show</b> and the <b>song</b>
+								</>
+							),
+						})}
 					>
 						<IconButton
 							component="a"
@@ -276,13 +276,13 @@ export function ArtistOfSong({ song }: { song: SchemaDataRowParented }) {
 	if (!artist) {
 		return (
 			<PopButton
-				tooltipProps={{
+				tooltipProps={tooltipProps({
 					title: (
 						<>
 							Click to check related <b>artist</b> of the song
 						</>
 					),
-				}}
+				})}
 				popoverContent={
 					<ArtistPopCard
 						artistId={song.artist_id as string}
@@ -296,17 +296,14 @@ export function ArtistOfSong({ song }: { song: SchemaDataRowParented }) {
 	}
 	return (
 		<Tooltip
-			slotProps={{
-				tooltip: {
-					sx: { whiteSpace: 'nowrap' },
-				},
-			}}
-			title={
-				<>
-					Search the YouTube with the names of the <b>artist</b> and
-					the <b>song</b>
-				</>
-			}
+			{...tooltipProps({
+				title: (
+					<>
+						Search the YouTube with the names of the <b>artist</b>{' '}
+						and the <b>song</b>
+					</>
+				),
+			})}
 		>
 			<IconButton
 				component="a"

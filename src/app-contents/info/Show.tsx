@@ -1,7 +1,7 @@
 import { getRandomColor } from './utils';
 import { peers, useSchemaQuery } from '../api-calls';
 import { SongList } from './Song';
-import { ReactElement } from 'react';
+import { tooltipProps } from './utils-component';
 
 import {
 	useSchemaPk,
@@ -19,6 +19,8 @@ import {
 	IconButton,
 	Tooltip,
 } from '@mui/material';
+
+import { ReactElement } from 'react';
 
 export function ShowCells({ show, from }: ShowCellsProps): ReactElement {
 	const [relatedType, related] = from ?? [];
@@ -55,17 +57,14 @@ export function ShowCells({ show, from }: ShowCellsProps): ReactElement {
 			</Stack>
 			{relatedType === 'song' && (
 				<Tooltip
-					slotProps={{
-						tooltip: {
-							sx: { whiteSpace: 'nowrap' },
-						},
-					}}
-					title={
-						<>
-							Search the YouTube with the names of the <b>show</b>{' '}
-							and the <b>song</b>
-						</>
-					}
+					{...tooltipProps({
+						title: (
+							<>
+								Search the YouTube with the names of the{' '}
+								<b>show</b> and the <b>song</b>
+							</>
+						),
+					})}
 				>
 					<IconButton
 						sx={{ ml: 2 }}

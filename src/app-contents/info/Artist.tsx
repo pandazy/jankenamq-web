@@ -29,6 +29,7 @@ import {
 	Tooltip,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
+import { tooltipProps } from './utils-component';
 
 function SongListOfArtist({
 	artist,
@@ -134,12 +135,14 @@ export function ArtistCells({
 			</Stack>
 			{relatedType === 'song' && (
 				<Tooltip
-					title={
-						<>
-							Search the YouTube with the names of the{' '}
-							<b>artist</b> and the <b>song</b>
-						</>
-					}
+					{...tooltipProps({
+						title: (
+							<>
+								Search the YouTube with the names of the{' '}
+								<b>artist</b> and the <b>song</b>
+							</>
+						),
+					})}
 				>
 					<IconButton
 						component="a"
