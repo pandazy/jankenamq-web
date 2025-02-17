@@ -25,7 +25,6 @@ export default function EntryLearn(): ReactElement {
 	const { data: learningMap, isLoading: learningIsLoading } = useLearningMap(
 		songIds as string[],
 	);
-	console.log(learningMap);
 	return (
 		<Frame forRoute="learn">
 			<h1>Learning songs</h1>

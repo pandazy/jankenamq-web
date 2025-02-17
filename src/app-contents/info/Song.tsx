@@ -20,6 +20,7 @@ import {
 	Chip,
 	Button,
 	Tooltip,
+	Avatar,
 } from '@mui/material';
 import {
 	MusicNote,
@@ -31,6 +32,7 @@ import {
 	Repeat,
 	LocalLibraryTwoTone,
 } from '@mui/icons-material';
+import { getRandomColor } from './utils';
 import { useQuery } from '@tanstack/react-query';
 
 function ShowList({ song }: { song: SchemaDataRowParented }) {
@@ -71,6 +73,79 @@ function ShowList({ song }: { song: SchemaDataRowParented }) {
 	);
 }
 
+function LearningSection({
+	learning,
+}: {
+	learning?: SchemaDataRowParented;
+}): ReactElement {
+	return (
+		<>
+			{learning && (
+				<>
+					{Boolean(parseInt(learning.graduated as string)) && (
+						<>
+							<Tooltip title="You have learned this song">
+								<Chip
+									icon={
+										<SchoolOutlined
+											sx={{ fill: 'white' }}
+										/>
+									}
+									label="✔"
+									sx={{
+										ml: 2,
+										backgroundColor: 'success.light',
+										color: 'white',
+									}}
+								/>
+							</Tooltip>
+							<Tooltip title="Re-learn this song">
+								<Button
+									variant="outlined"
+									size="small"
+									sx={{ ml: 2 }}
+								>
+									<Repeat />
+								</Button>
+							</Tooltip>
+						</>
+					)}
+					{!parseInt(learning.graduated as string) && (
+						<Tooltip
+							title={`You are learning this song at level ${
+								(learning?.level as number) + 1
+							}`}
+						>
+							<Chip
+								icon={<MilitaryTech sx={{ fill: 'white' }} />}
+								label={(learning?.level as number) + 1}
+								sx={{
+									ml: 2,
+									backgroundColor: 'primary.light',
+									color: 'white',
+								}}
+							/>
+						</Tooltip>
+					)}
+				</>
+			)}
+			{!learning && (
+				<Tooltip
+					title={
+						<>
+							Click to <b>start learning</b> this song
+						</>
+					}
+				>
+					<Button variant="outlined" size="small" sx={{ ml: 2 }}>
+						<LocalLibraryTwoTone />
+					</Button>
+				</Tooltip>
+			)}
+		</>
+	);
+}
+
 export function SongCells({
 	song,
 	from,
@@ -86,13 +161,22 @@ export function SongCells({
 			`${related?.name} ${song?.name}`,
 		)}`;
 	return (
-		<>
+		<Stack
+			direction="row"
+			spacing={2}
+			justifyContent="space-between"
+			sx={{ width: '100%' }}
+		>
 			<Stack
 				direction="row"
 				alignItems="center"
 				spacing={2}
 				sx={{ py: 2 }}
 			>
+				<Avatar sx={{ backgroundColor: getRandomColor() }}>
+					<MusicNote />
+				</Avatar>
+				<LearningSection learning={learning} />
 				<ListItemText
 					sx={{ ml: 2 }}
 					primary={
@@ -183,73 +267,7 @@ export function SongCells({
 					</Tooltip>
 				)}
 			</Stack>
-			<Stack direction="row" alignItems="center">
-				{!learning && (
-					<Tooltip
-						title={
-							<>
-								Click to <b>start learning</b> this song
-							</>
-						}
-					>
-						<Button variant="outlined" size="small" sx={{ ml: 2 }}>
-							<LocalLibraryTwoTone />
-						</Button>
-					</Tooltip>
-				)}
-				{learning && (
-					<>
-						{Boolean(parseInt(learning.graduated as string)) && (
-							<>
-								<Tooltip title="You have learned this song">
-									<Chip
-										icon={
-											<SchoolOutlined
-												sx={{ fill: 'white' }}
-											/>
-										}
-										label="✔"
-										sx={{
-											ml: 2,
-											backgroundColor: 'success.light',
-											color: 'white',
-										}}
-									/>
-								</Tooltip>
-								<Tooltip title="Re-learn this song">
-									<Button
-										variant="outlined"
-										size="small"
-										sx={{ ml: 2 }}
-									>
-										<Repeat />
-									</Button>
-								</Tooltip>
-							</>
-						)}
-						{!parseInt(learning.graduated as string) && (
-							<Tooltip
-								title={`You are learning this song at level ${
-									(learning?.level as number) + 1
-								}`}
-							>
-								<Chip
-									icon={
-										<MilitaryTech sx={{ fill: 'white' }} />
-									}
-									label={(learning?.level as number) + 1}
-									sx={{
-										ml: 2,
-										backgroundColor: 'primary.light',
-										color: 'white',
-									}}
-								/>
-							</Tooltip>
-						)}
-					</>
-				)}
-			</Stack>
-		</>
+		</Stack>
 	);
 }
 
