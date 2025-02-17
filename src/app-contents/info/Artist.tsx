@@ -1,4 +1,4 @@
-import { SongCells } from './Song';
+import { SongList } from './Song';
 import { getRandomColor } from './utils';
 
 import {
@@ -9,8 +9,10 @@ import {
 } from '../api-calls';
 
 import {
+	AnimatedLoadingBar,
 	Piece,
 	PopButton,
+	PopCard,
 	PopCardList,
 	SchemaDataRow,
 	useSchemaPk,
@@ -24,6 +26,7 @@ import {
 	ListItemText,
 	Stack,
 	IconButton,
+	Tooltip,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 
@@ -40,7 +43,7 @@ function SongListOfArtist({
 	);
 	const { data, isLoading } = useQuery({
 		queryKey: ['song', 'artist', pk ?? ''],
-		queryFn: () => children('song', 'artist', pk ?? '', 20),
+		queryFn: () => children('song', 'artist', [pk ?? ''], 20),
 		enabled: !hasError,
 	});
 
@@ -49,25 +52,28 @@ function SongListOfArtist({
 	}
 
 	return (
-		<PopCardList
-			header={
-				<>
-					<span>Songs by </span>
-					<b>
-						<Piece
-							table="artist"
-							srcRow={artist as SchemaDataRow}
-							col="name"
-						/>
-					</b>
-				</>
-			}
-			data={data?.records ?? []}
-			isLoading={isLoading}
-			makeItemContent={(item: SchemaDataRowParented) => (
-				<SongCells song={item} from={['artist', artist]} />
-			)}
-		/>
+		<>
+			<PopCard
+				header={
+					<>
+						<span>Songs by </span>
+						<b>
+							<Piece
+								table="artist"
+								srcRow={artist as SchemaDataRow}
+								col="name"
+							/>
+						</b>
+					</>
+				}
+			>
+				<AnimatedLoadingBar isLoading={isLoading} />
+				<SongList
+					songs={data?.records ?? []}
+					from={['artist', artist]}
+				/>
+			</PopCard>
+		</>
 	);
 }
 
@@ -83,7 +89,12 @@ export function ArtistCells({
 	const [relatedType, related] = from ?? [];
 	return (
 		<>
-			<Stack direction="row" alignItems="center">
+			<Stack
+				direction="row"
+				alignItems="center"
+				spacing={2}
+				sx={{ py: 2 }}
+			>
 				<ListItemAvatar>
 					<Avatar sx={{ backgroundColor: getRandomColor() }}>
 						<Person />
@@ -100,12 +111,18 @@ export function ArtistCells({
 				/>
 				{relatedType !== 'song' && (
 					<PopButton
+						tooltipProps={{
+							title: (
+								<>
+									See related <b>song</b> of the artist
+								</>
+							),
+						}}
 						buttonProps={{
 							variant: 'outlined',
 							sx: {
 								ml: 10,
 							},
-							title: 'See related song of the artist',
 						}}
 						popoverContent={
 							<SongListOfArtist artist={artist} table="artist" />
@@ -116,18 +133,26 @@ export function ArtistCells({
 				)}
 			</Stack>
 			{relatedType === 'song' && (
-				<IconButton
-					component="a"
-					href={`https://www.youtube.com/results?search_query=${encodeURIComponent(
-						`${artist?.name} ${related?.name}`,
-					)}`}
-					target="_blank"
-					rel="noopener noreferrer"
-					title={`Search the song by the artist on YouTube`}
-					sx={{ ml: 1 }}
+				<Tooltip
+					title={
+						<>
+							Search the YouTube with the names of the{' '}
+							<b>artist</b> and the <b>song</b>
+						</>
+					}
 				>
-					<Person /> + <MusicNote /> =&gt; <YouTube />
-				</IconButton>
+					<IconButton
+						component="a"
+						href={`https://www.youtube.com/results?search_query=${encodeURIComponent(
+							`${artist?.name} ${related?.name}`,
+						)}`}
+						target="_blank"
+						rel="noopener noreferrer"
+						sx={{ ml: 1 }}
+					>
+						<Person /> + <MusicNote /> =&gt; <YouTube />
+					</IconButton>
+				</Tooltip>
 			)}
 		</>
 	);

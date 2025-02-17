@@ -7,7 +7,6 @@ import { Radio, FormControlLabel, RadioGroup, Stack } from '@mui/material';
 import { SearchList } from './info/SearchList';
 import { ShowCells } from './info/Show';
 import { ArtistCells } from './info/Artist';
-import { SongCells } from './info/Song';
 
 export default function EntryHome(): ReactElement {
 	const { keyword, exact } = useSearchContext();
@@ -52,8 +51,6 @@ export default function EntryHome(): ReactElement {
 							switch (sourceType) {
 								case 'show':
 									return <ShowCells show={item} />;
-								case 'song':
-									return <SongCells song={item} />;
 								case 'artist':
 									return <ArtistCells artist={item} />;
 							}

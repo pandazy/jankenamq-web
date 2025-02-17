@@ -1,6 +1,6 @@
 import { getRandomColor } from './utils';
 import { peers, useSchemaQuery } from '../api-calls';
-import { SongCells } from './Song';
+import { SongList } from './Song';
 import { ReactElement } from 'react';
 
 import {
@@ -8,17 +8,24 @@ import {
 	SchemaDataRow,
 	PopButton,
 	Piece,
-	PopCardList,
+	PopCard,
+	AnimatedLoadingBar,
 } from '@pandazy/jankenstore-client-web';
 import { Movie, MusicNote, YouTube } from '@mui/icons-material';
-import { Stack, ListItemText, Avatar, IconButton, Alert } from '@mui/material';
+import {
+	Stack,
+	ListItemText,
+	Avatar,
+	IconButton,
+	Tooltip,
+} from '@mui/material';
 
 export function ShowCells({ show, from }: ShowCellsProps): ReactElement {
 	const [relatedType, related] = from ?? [];
 
 	return (
 		<>
-			<Stack direction="row" spacing={2}>
+			<Stack direction="row" spacing={2} sx={{ py: 2 }}>
 				<Avatar sx={{ backgroundColor: getRandomColor() }}>
 					<Movie />
 				</Avatar>
@@ -30,9 +37,15 @@ export function ShowCells({ show, from }: ShowCellsProps): ReactElement {
 				/>
 				{relatedType !== 'song' && (
 					<PopButton
+						tooltipProps={{
+							title: (
+								<>
+									See <b>songs</b> in the show
+								</>
+							),
+						}}
 						buttonProps={{
 							variant: 'outlined',
-							title: 'See songs in the show',
 						}}
 						popoverContent={<SongListOfShow show={show} />}
 					>
@@ -41,18 +54,31 @@ export function ShowCells({ show, from }: ShowCellsProps): ReactElement {
 				)}
 			</Stack>
 			{relatedType === 'song' && (
-				<IconButton
-					sx={{ ml: 2 }}
-					component="a"
-					href={`https://www.youtube.com/results?search_query=${encodeURIComponent(
-						`${show?.name} ${related?.name}`,
-					)}`}
-					target="_blank"
-					rel="noopener noreferrer"
-					title={`Search the song of the show on YouTube`}
+				<Tooltip
+					slotProps={{
+						tooltip: {
+							sx: { whiteSpace: 'nowrap' },
+						},
+					}}
+					title={
+						<>
+							Search the YouTube with the names of the <b>show</b>{' '}
+							and the <b>song</b>
+						</>
+					}
 				>
-					<Movie /> + <MusicNote /> =&gt; <YouTube />
-				</IconButton>
+					<IconButton
+						sx={{ ml: 2 }}
+						component="a"
+						href={`https://www.youtube.com/results?search_query=${encodeURIComponent(
+							`${show?.name} ${related?.name}`,
+						)}`}
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						<Movie /> + <MusicNote /> =&gt; <YouTube />
+					</IconButton>
+				</Tooltip>
 			)}
 		</>
 	);
@@ -64,11 +90,7 @@ export interface ShowCellsProps {
 }
 
 export function SongListOfShow({ show }: { show: SchemaDataRow }) {
-	const {
-		pk: showPk,
-		error,
-		hasError,
-	} = useSchemaPk<string>('show', show as SchemaDataRow);
+	const { pk: showPk } = useSchemaPk<string>('show', show as SchemaDataRow);
 	const { data, isLoading } = useSchemaQuery(
 		{
 			table: 'song',
@@ -79,12 +101,10 @@ export function SongListOfShow({ show }: { show: SchemaDataRow }) {
 			queryFn: () => peers('song', { show: [showPk ?? ''] }, 20),
 		},
 	);
-	if (hasError) {
-		return <Alert severity="error">{(error as Error).message}</Alert>;
-	}
+
 	return (
 		<>
-			<PopCardList
+			<PopCard
 				header={
 					<>
 						<span>Songs in </span>
@@ -93,12 +113,10 @@ export function SongListOfShow({ show }: { show: SchemaDataRow }) {
 						</b>
 					</>
 				}
-				data={(data?.records ?? []) as SchemaDataRow[]}
-				isLoading={isLoading}
-				makeItemContent={(item) => (
-					<SongCells song={item} from={['show', show]} />
-				)}
-			/>
+			>
+				<AnimatedLoadingBar isLoading={isLoading} />
+				<SongList songs={data?.records ?? []} from={['show', show]} />
+			</PopCard>
 		</>
 	);
 }

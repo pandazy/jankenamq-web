@@ -180,7 +180,7 @@ export async function search(
 export async function children(
 	table: string,
 	parentTable: string,
-	parentId: string,
+	parentIds: string[],
 	limit = 10,
 	offset = 0,
 	orderBy = 'created_at desc',
@@ -188,7 +188,7 @@ export async function children(
 	const url = new URL(`${ADDR}/store_read`);
 	Object.entries({
 		op: JSON.stringify({
-			Children: { src: table, parents: { [parentTable]: [parentId] } },
+			Children: { src: table, parents: { [parentTable]: parentIds } },
 		}),
 		limit,
 		offset,
@@ -249,4 +249,31 @@ export async function allLearnings(
 		headers: CommonHeaders,
 	});
 	return await res.json();
+}
+
+export function useLearningMap(
+	songIds: string[],
+	enabled: boolean = true,
+): UseQueryResult<Record<string, SchemaDataRowParented>> {
+	const { data: learningList, ...others } = useQuery({
+		queryKey: ['learning', 'song', songIds],
+		queryFn: () => children('learning', 'song', songIds, 20),
+		enabled: enabled && songIds.length > 0,
+	});
+	const learningMap =
+		learningList?.records.reduce((acc, learning) => {
+			const existing = acc[learning.song_id];
+			if (
+				!existing ||
+				(existing.graduated &&
+					(existing.updated_at ?? 0) < (learning.updated_at ?? 0))
+			) {
+				acc[learning.song_id] = learning;
+			}
+			return acc;
+		}, {} as Record<string, SchemaDataRowParented>) ?? {};
+	return {
+		...others,
+		data: learningMap,
+	} as unknown as UseQueryResult<Record<string, SchemaDataRowParented>>;
 }

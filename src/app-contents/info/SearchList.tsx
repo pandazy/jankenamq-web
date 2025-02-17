@@ -3,9 +3,10 @@ import { search } from '../api-calls';
 
 import { ReactElement, ReactNode } from 'react';
 import { DataList, SchemaDataRow } from '@pandazy/jankenstore-client-web';
+import { SongList } from './Song';
 
 export interface SearchListProps {
-	source: [string, string];
+	source: [sourceType: string, searchColumn: string];
 	keyword: string;
 	exact: boolean;
 	title?: string;
@@ -32,11 +33,17 @@ export function SearchList({
 			queryFn,
 		},
 	);
+	const [sourceType] = source;
 	return (
-		<DataList
-			data={(data?.records ?? []) as SchemaDataRow[]}
-			isLoading={isLoading}
-			makeItemContent={makeCell}
-		/>
+		<>
+			{sourceType === 'song' && <SongList songs={data?.records ?? []} />}
+			{sourceType != 'song' && (
+				<DataList
+					data={(data?.records ?? []) as SchemaDataRow[]}
+					isLoading={isLoading}
+					makeItemContent={makeCell}
+				/>
+			)}
+		</>
 	);
 }
