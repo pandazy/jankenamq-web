@@ -1,5 +1,6 @@
+import { RouteAvatarSettings } from '@pandazy/jankenstore-client-web';
+
 import { MusicNote, Psychology, UploadFile } from '@mui/icons-material';
-import { RouteAvatarSettings } from '@pandazy/jankenstore-client-web/dist/nav/AvatarNav';
 
 export type RouteType = 'learn' | 'home' | 'import';
 

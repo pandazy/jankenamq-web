@@ -5,8 +5,8 @@ import { ReactElement, useState } from 'react';
 import Frame from './Frame';
 import { Radio, FormControlLabel, RadioGroup, Stack } from '@mui/material';
 import { SearchList } from './info/SearchList';
-import { ShowCells } from './info/Show';
-import { ArtistCells } from './info/Artist';
+import { ShowRow } from './info/Show';
+import { ArtistRow } from './info/Artist';
 
 export default function EntryHome(): ReactElement {
 	const { keyword, exact } = useSearchContext();
@@ -50,9 +50,9 @@ export default function EntryHome(): ReactElement {
 						makeCell={(item) => {
 							switch (sourceType) {
 								case 'show':
-									return <ShowCells show={item} />;
+									return <ShowRow show={item} />;
 								case 'artist':
-									return <ArtistCells artist={item} />;
+									return <ArtistRow artist={item} />;
 							}
 						}}
 					/>

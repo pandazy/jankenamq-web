@@ -1,8 +1,10 @@
 import { useSearchContext } from './SearchContext';
 
 import { DebouncedTextField } from '@pandazy/jankenstore-client-web';
-import { ReactElement } from 'react';
+
 import { FormControlLabel, Switch } from '@mui/material';
+
+import { ReactElement } from 'react';
 
 export default function GlobalSearch(): ReactElement {
 	const { keyword, setKeyword, exact, setExact } = useSearchContext();
@@ -17,7 +19,7 @@ export default function GlobalSearch(): ReactElement {
 					/>
 				}
 				label="Exact Match"
-				sx={{ mb: 1 }}
+				sx={{ mb: 1, width: 'fit-content' }}
 			/>
 			<DebouncedTextField
 				textFieldProps={{

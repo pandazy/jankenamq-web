@@ -1,14 +1,19 @@
-import { ReactElement } from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { schema } from './api-calls';
 import EntryHome from './EntryHome';
 import EntryLearn from './EntryLearn';
 import EntryImport from './EntryImport';
 import { RouteConf, RouteType } from './route-conf';
+
+import {
+	SchemaCheckProvider,
+	SchemaFamily,
+} from '@pandazy/jankenstore-client-web';
+
 import { useQuery } from '@tanstack/react-query';
-import { schema } from './api-calls';
 import { Alert, Skeleton } from '@mui/material';
-import { SchemaCheckProvider } from '@pandazy/jankenstore-client-web';
-import { SchemaFamily } from '@pandazy/jankenstore-client-web';
+
+import { ReactElement } from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 const Routes: Record<RouteType, ReactElement> = {
 	home: <EntryHome />,

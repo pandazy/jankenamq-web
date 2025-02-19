@@ -1,14 +1,12 @@
+import { dueLearning, useLearningMap } from './info/learning/api-calls';
 import Frame from './Frame';
-import {
-	allLearnings,
-	SchemaDataRowParented,
-	useLearningMap,
-	useSchemaQuery,
-} from './api-calls';
+import { SchemaDataRowParented, useSchemaQuery } from './api-calls';
+import { QueryKeys } from './info/query-keys';
+import { SongRow } from './info/Song';
+
+import { DataList } from '@pandazy/jankenstore-client-web';
 
 import { ReactElement } from 'react';
-import { SongCells } from './info/Song';
-import { DataList } from '@pandazy/jankenstore-client-web';
 
 export default function EntryLearn(): ReactElement {
 	const { data, isLoading } = useSchemaQuery(
@@ -17,8 +15,8 @@ export default function EntryLearn(): ReactElement {
 			fillParent: true,
 		},
 		{
-			queryKey: ['learning'],
-			queryFn: async () => allLearnings(),
+			queryKey: [QueryKeys.learning],
+			queryFn: async () => dueLearning(),
 		},
 	);
 	const songIds = data?.records.map((learning) => learning.song_id) ?? [];
@@ -33,7 +31,7 @@ export default function EntryLearn(): ReactElement {
 				isLoading={isLoading || learningIsLoading}
 				makeItemContent={(item: SchemaDataRowParented) => {
 					return (
-						<SongCells
+						<SongRow
 							song={item.$parents?.song as SchemaDataRowParented}
 							learning={
 								learningMap?.[item.$parents?.song.id as string]

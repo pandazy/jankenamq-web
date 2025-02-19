@@ -1,9 +1,10 @@
-import { all, useSchemaQuery } from '../api-calls';
-import { search } from '../api-calls';
+import { all, useSchemaQuery, search } from '~/app-contents/api-calls';
+
+import { SongList } from '~/app-contents/info/Song';
+
+import { DataList, SchemaDataRow } from '@pandazy/jankenstore-client-web';
 
 import { ReactElement, ReactNode } from 'react';
-import { DataList, SchemaDataRow } from '@pandazy/jankenstore-client-web';
-import { SongList } from './Song';
 
 export interface SearchListProps {
 	source: [sourceType: string, searchColumn: string];
