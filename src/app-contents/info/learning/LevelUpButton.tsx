@@ -108,6 +108,8 @@ export interface LevelUpCardProps {
 	learning: SchemaDataRow;
 	nextButtonProps: Omit<LevelTo1ButtonProps, 'direction'>;
 	prevButtonProps: Omit<LevelTo1ButtonProps, 'direction'>;
+	onChangeSlider: (value: number) => void;
+	sliderDisabled?: boolean;
 }
 
 export function LevelUpCard({
@@ -115,6 +117,8 @@ export function LevelUpCard({
 	learning,
 	nextButtonProps,
 	prevButtonProps,
+	onChangeSlider,
+	sliderDisabled,
 }: LevelUpCardProps): ReactElement {
 	const [displayLevel, setDisplayLevel] = useState(
 		(learning.level as number) + 1,
@@ -134,14 +138,12 @@ export function LevelUpCard({
 			<List>
 				<ListItem>
 					<Stack>
-						<Chip
-							label={
-								<>
-									Level{' '}
-									<b>{(learning.level as number) + 1}</b>
-								</>
-							}
-						/>
+						<Stack direction="row" alignItems="center">
+							Level{' '}
+							<Avatar sx={{ width: 40, height: 40, ml: 1 }}>
+								{displayLevel}
+							</Avatar>
+						</Stack>
 						<Typography variant="caption" sx={{ mt: 3 }}>
 							To change your level, you can:
 						</Typography>
@@ -156,51 +158,49 @@ export function LevelUpCard({
 						alignItems="center"
 					>
 						<LevelTo1Button
-							direction="up"
-							onClick={nextButtonProps.onClick}
-							disabled={nextButtonProps.disabled}
-						/>
-						<LevelTo1Button
 							direction="down"
 							onClick={prevButtonProps.onClick}
 							disabled={prevButtonProps.disabled}
 						/>
-					</Stack>
-				</ListItem>
-				<ListItem>
-					<Typography>Or:</Typography>
-					<Tooltip
-						{...DefaultTooltipProps}
-						title="Select a level between 1 and 20"
-					>
-						<Slider
-							sx={{ ml: 2 }}
-							min={1}
-							max={getMaxLevel(learning)}
-							step={1}
-							marks={true}
-							value={displayLevel}
-							onChange={(_, value) =>
-								setDisplayLevel(value as number)
-							}
+						<Tooltip
+							{...DefaultTooltipProps}
+							title="Select a level between 1 and 20"
+						>
+							<Slider
+								sx={{ ml: 2, minWidth: 300 }}
+								min={1}
+								max={getMaxLevel(learning)}
+								step={1}
+								marks={true}
+								value={displayLevel}
+								onChange={(_, value) => {
+									setDisplayLevel(value as number);
+									onChangeSlider(value as number);
+								}}
+								disabled={sliderDisabled}
+							/>
+						</Tooltip>
+						<LevelTo1Button
+							direction="up"
+							onClick={nextButtonProps.onClick}
+							disabled={nextButtonProps.disabled}
 						/>
-					</Tooltip>
-					<Avatar sx={{ width: 40, height: 40, ml: 1 }}>
-						{displayLevel}
-					</Avatar>
+					</Stack>
 				</ListItem>
 			</List>
 		</PopCard>
 	);
 }
 
+export interface LevelUpButtonProps {
+	song: SchemaDataRow;
+	learning: SchemaDataRow;
+}
+
 export default function LevelUpButton({
 	song,
 	learning,
-}: Omit<
-	LevelUpCardProps,
-	'nextButtonProps' | 'prevButtonProps'
->): ReactElement {
+}: LevelUpButtonProps): ReactElement {
 	const nextLevelSec = learning
 		? getTimeUntilNextLevel(learning as SchemaDataRow)
 		: 0;
@@ -241,6 +241,8 @@ export default function LevelUpButton({
 						disabled: isPending || prevLevel < 0,
 						onClick: () => mutate(prevLevel),
 					}}
+					onChangeSlider={(value) => mutate(value - 1)}
+					sliderDisabled={isPending}
 				/>
 			}
 		>
