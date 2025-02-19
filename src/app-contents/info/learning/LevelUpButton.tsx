@@ -84,15 +84,20 @@ function LevelTo1Button({
 		<Tooltip
 			{...DefaultTooltipProps}
 			title={
-				<>
+				<span>
 					{direction === 'up'
 						? 'Increase your level by 1'
 						: 'Decrease your level by 1'}
-				</>
+				</span>
 			}
 		>
 			<Button
+				component={disabled ? 'div' : 'button'}
 				variant="outlined"
+				sx={{
+					cursor: disabled ? 'not-allowed' : 'pointer',
+					opacity: disabled ? 0.7 : 1,
+				}}
 				color={direction === 'up' ? 'primary' : 'secondary'}
 				onClick={onClick}
 				disabled={disabled}
@@ -169,7 +174,7 @@ export function LevelUpCard({
 							<Slider
 								sx={{ ml: 2, minWidth: 300 }}
 								min={1}
-								max={getMaxLevel(learning)}
+								max={getMaxLevel(learning) + 1}
 								step={1}
 								marks={true}
 								value={displayLevel}

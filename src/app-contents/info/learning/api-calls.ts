@@ -113,6 +113,7 @@ export async function learningSummary(): Promise<{
 	totalArtists: number;
 	totalGraduatedSongs: number;
 	totalLearningSongs: number;
+	totalDueLearningSongs: number;
 }> {
 	const url = new URL(`${ADDR}/summary`);
 	const res = await fetch(url, {

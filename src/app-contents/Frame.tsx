@@ -12,6 +12,7 @@ import {
 	MusicNote,
 	Person,
 	SchoolTwoTone,
+	AccessTimeTwoTone,
 } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
 
@@ -34,6 +35,22 @@ function SummaryBoard() {
 		<Stack spacing={2}>
 			<AnimatedLoadingBar isLoading={isLoading} />
 			<Stack direction="row" spacing={2}>
+				<Tooltip
+					title={
+						<>
+							Total <b>songs</b> that are due for level up
+						</>
+					}
+				>
+					<Badge
+						{...commonBadgeProps(
+							summary?.totalDueLearningSongs ?? 0,
+						)}
+						color="warning"
+					>
+						<AccessTimeTwoTone color="warning" />
+					</Badge>
+				</Tooltip>
 				<Tooltip
 					title={
 						<>
@@ -77,7 +94,7 @@ function SummaryBoard() {
 					<Badge
 						{...commonBadgeProps(summary?.totalLearningSongs ?? 0)}
 					>
-						<LocalLibraryTwoTone color="warning" />
+						<LocalLibraryTwoTone color="primary" />
 					</Badge>
 				</Tooltip>
 				<Tooltip
