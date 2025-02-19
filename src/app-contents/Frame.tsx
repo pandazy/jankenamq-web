@@ -93,8 +93,9 @@ function SummaryBoard() {
 				>
 					<Badge
 						{...commonBadgeProps(summary?.totalLearningSongs ?? 0)}
+						color="secondary"
 					>
-						<LocalLibraryTwoTone color="primary" />
+						<LocalLibraryTwoTone color="secondary" />
 					</Badge>
 				</Tooltip>
 				<Tooltip
@@ -106,6 +107,7 @@ function SummaryBoard() {
 				>
 					<Badge
 						{...commonBadgeProps(summary?.totalGraduatedSongs ?? 0)}
+						color="success"
 					>
 						<SchoolTwoTone color="success" />
 					</Badge>

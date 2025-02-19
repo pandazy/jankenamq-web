@@ -15,6 +15,7 @@ import {
 	ListItemText,
 	IconButton,
 	Tooltip,
+	Typography,
 } from '@mui/material';
 import { Movie, MusicNote, YouTube } from '@mui/icons-material';
 
@@ -35,7 +36,20 @@ export default function ShowRow({ show, from }: ShowRowProps): ReactElement {
 					<Movie />
 				</Avatar>
 				<ListItemText
-					primary={<Piece table="show" srcRow={show} col="name" />}
+					primary={
+						<Stack>
+							<Piece table="show" srcRow={show} col="name" />
+							<Typography variant="caption">
+								(
+								<Piece
+									table="show"
+									srcRow={show}
+									col="name_romaji"
+								/>
+								)
+							</Typography>
+						</Stack>
+					}
 					secondary={
 						<Piece table="show" srcRow={show} col="vintage" />
 					}
@@ -51,6 +65,7 @@ export default function ShowRow({ show, from }: ShowRowProps): ReactElement {
 						}}
 						buttonProps={{
 							variant: 'outlined',
+							sx: { height: 'fit-content' },
 						}}
 						popoverContent={<SongListOfShow show={show} />}
 					>

@@ -3,7 +3,13 @@ import { useSearchContext } from './SearchContext';
 
 import { ReactElement, useState } from 'react';
 import Frame from './Frame';
-import { Radio, FormControlLabel, RadioGroup, Stack } from '@mui/material';
+import {
+	Radio,
+	FormControlLabel,
+	RadioGroup,
+	Stack,
+	Typography,
+} from '@mui/material';
 import { SearchList } from './info/SearchList';
 import { ShowRow } from './info/Show';
 import { ArtistRow } from './info/Artist';
@@ -12,6 +18,9 @@ export default function EntryHome(): ReactElement {
 	const { keyword, exact } = useSearchContext();
 	const [sourceType, setSourceType] = useState<'show' | 'song' | 'artist'>(
 		'show',
+	);
+	const [showNameCol, setShowNameCol] = useState<'name' | 'name_romaji'>(
+		'name',
 	);
 	return (
 		<div>
@@ -43,8 +52,38 @@ export default function EntryHome(): ReactElement {
 							label="Artists"
 						/>
 					</RadioGroup>
+					{sourceType === 'show' && (
+						<RadioGroup
+							value={showNameCol}
+							onChange={(e) =>
+								setShowNameCol(
+									e.target.value as 'name' | 'name_romaji',
+								)
+							}
+							row
+						>
+							<Stack direction="row" alignItems="center">
+								<Typography variant="caption" sx={{ mr: 1 }}>
+									Search by:
+								</Typography>
+								<FormControlLabel
+									value="name"
+									control={<Radio />}
+									label="Name"
+								/>
+								<FormControlLabel
+									value="name_romaji"
+									control={<Radio />}
+									label="Name (Romaji)"
+								/>
+							</Stack>
+						</RadioGroup>
+					)}
 					<SearchList
-						source={[sourceType, 'name']}
+						source={[
+							sourceType,
+							sourceType === 'show' ? showNameCol : 'name',
+						]}
 						keyword={keyword}
 						exact={exact}
 						makeCell={(item) => {

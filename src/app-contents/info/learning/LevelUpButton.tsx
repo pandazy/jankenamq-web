@@ -210,7 +210,7 @@ export default function LevelUpButton({
 		? getTimeUntilNextLevel(learning as SchemaDataRow)
 		: 0;
 	const timeDisplay = getTimeUntilNextLevelDisplay(nextLevelSec);
-	const expired = nextLevelSec <= 0;
+	const expired = nextLevelSec <= 0 || timeDisplay === 'expired';
 	const nextLevel = (learning.level as number) + 1;
 	const prevLevel = (learning.level as number) - 1;
 	const maxLevel = getMaxLevel(learning);
