@@ -9,13 +9,30 @@ import {
 	RadioGroup,
 	Stack,
 	Typography,
-	Tooltip,
 	Divider,
+	Tabs,
+	Tab,
 } from '@mui/material';
 import { SearchList } from './info/SearchList';
 import { ShowRow } from './info/Show';
 import { ArtistRow } from './info/Artist';
 import { Movie, MusicNote, Person } from '@mui/icons-material';
+
+const DataTypesMap = {
+	show: {
+		label: 'Shows',
+		icon: <Movie sx={{ width: 48, height: 48 }} />,
+	},
+	song: {
+		label: 'Songs',
+		icon: <MusicNote sx={{ width: 48, height: 48 }} />,
+	},
+	artist: {
+		label: 'Artists',
+		icon: <Person sx={{ width: 48, height: 48 }} />,
+	},
+};
+const DataTypeList: (keyof typeof DataTypesMap)[] = ['show', 'song', 'artist'];
 
 export default function EntryHome(): ReactElement {
 	const { keyword, exact } = useSearchContext();
@@ -33,74 +50,23 @@ export default function EntryHome(): ReactElement {
 				</Typography>
 				<Stack direction="column" sx={{ mt: 2 }}>
 					<Stack direction="row" alignItems="center">
-						<Typography variant="caption" sx={{ mr: 1 }}>
-							Data type:
-						</Typography>
-						<RadioGroup
+						<Tabs
 							value={sourceType}
-							onChange={(e) =>
+							onChange={(_, value) =>
 								setSourceType(
-									e.target.value as
-										| 'show'
-										| 'song'
-										| 'artist',
+									value as 'show' | 'song' | 'artist',
 								)
 							}
-							row
-							sx={{ pb: 3, ml: 2 }}
 						>
-							{[
-								{
-									value: 'show',
-									label: 'Shows',
-									icon: (
-										<Movie sx={{ width: 48, height: 48 }} />
-									),
-								},
-								{
-									value: 'song',
-									label: 'Songs',
-									icon: (
-										<MusicNote
-											sx={{ width: 48, height: 48 }}
-										/>
-									),
-								},
-								{
-									value: 'artist',
-									label: 'Artists',
-									icon: (
-										<Person
-											sx={{ width: 48, height: 48 }}
-										/>
-									),
-								},
-							].map(({ value, label, icon }, i) => (
-								<Tooltip
-									title={label}
-									id={`${value}-search-radio-data-type-${i}`}
-									key={i}
-								>
-									<FormControlLabel
-										value={value}
-										control={<Radio />}
-										aria-labelledby={`${value}-tooltip-${i}`}
-										sx={{
-											flexDirection: 'column',
-											minHeight: 'fit-content',
-										}}
-										label={
-											<Stack
-												direction="row"
-												alignItems="center"
-											>
-												{icon}
-											</Stack>
-										}
-									/>
-								</Tooltip>
+							{DataTypeList.map((dataType) => (
+								<Tab
+									value={dataType}
+									key={`${dataType}-tab`}
+									label={DataTypesMap[dataType].label}
+									icon={DataTypesMap[dataType].icon}
+								/>
 							))}
-						</RadioGroup>
+						</Tabs>
 					</Stack>
 					{sourceType === 'show' && (
 						<>

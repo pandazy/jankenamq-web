@@ -102,7 +102,7 @@ function LevelTo1Button({
 		>
 			<Button
 				component={disabled ? 'div' : 'button'}
-				variant="outlined"
+				variant="contained"
 				sx={{
 					cursor: disabled ? 'not-allowed' : 'pointer',
 					opacity: disabled ? 0.7 : 1,
@@ -120,9 +120,7 @@ function LevelTo1Button({
 export interface LevelUpCardProps {
 	song: SchemaDataRow;
 	learning: SchemaDataRow;
-	nextButtonProps: Omit<LevelTo1ButtonProps, 'direction'>;
-	prevButtonProps: Omit<LevelTo1ButtonProps, 'direction'>;
-	onChangeSlider: (value: number) => void;
+	onApplySliderChange: (value: number) => void;
 	sliderDisabled?: boolean;
 	graduateButtonProps?: ButtonProps;
 	confirmGraduate?: boolean;
@@ -131,19 +129,19 @@ export interface LevelUpCardProps {
 export function LevelUpCard({
 	song,
 	learning,
-	nextButtonProps,
-	prevButtonProps,
-	onChangeSlider,
+	onApplySliderChange,
 	sliderDisabled,
 	graduateButtonProps,
 	confirmGraduate = true,
 }: LevelUpCardProps): ReactElement {
-	const [displayLevel, setDisplayLevel] = useState(
-		(learning.level as number) + 1,
-	);
+	const currentDisplayLevel = (learning.level as number) + 1;
+	const [displayLevel, setDisplayLevel] = useState(currentDisplayLevel);
+	const [sliderValue, setSliderValue] = useState(currentDisplayLevel);
 	const maxLevel = getMaxLevel(learning);
 	useEffect(() => {
-		setDisplayLevel((learning.level as number) + 1);
+		const newCurrentDisplayLevel = (learning.level as number) + 1;
+		setDisplayLevel(newCurrentDisplayLevel);
+		setSliderValue(newCurrentDisplayLevel);
 		if (learning.level === maxLevel) {
 			setDialogContent(
 				<Stack alignItems="center">
@@ -211,41 +209,70 @@ export function LevelUpCard({
 					</Stack>
 				</ListItem>
 				<ListItem>
-					<Stack
-						direction="row"
-						sx={{ width: '100%', py: 3 }}
-						spacing={1}
-						justifyContent="space-between"
-						alignItems="center"
-					>
-						<LevelTo1Button
-							direction="down"
-							onClick={prevButtonProps.onClick}
-							disabled={prevButtonProps.disabled}
-						/>
-						<Tooltip
-							{...DefaultTooltipProps}
-							title="Select a level between 1 and 20"
+					<Stack direction="column">
+						<Stack
+							direction="row"
+							sx={{ width: '100%', py: 3 }}
+							spacing={1}
+							justifyContent="space-between"
+							alignItems="center"
 						>
-							<Slider
-								sx={{ ml: 2, minWidth: 300 }}
-								min={1}
-								max={maxLevel + 1}
-								step={1}
-								marks={true}
-								value={displayLevel}
-								onChange={(_, value) => {
-									setDisplayLevel(value as number);
-									onChangeSlider(value as number);
+							<LevelTo1Button
+								direction="down"
+								onClick={() => {
+									setSliderValue(sliderValue - 1);
 								}}
-								disabled={sliderDisabled}
+								disabled={Boolean(
+									sliderDisabled || sliderValue <= 1,
+								)}
 							/>
-						</Tooltip>
-						<LevelTo1Button
-							direction="up"
-							onClick={nextButtonProps.onClick}
-							disabled={nextButtonProps.disabled}
-						/>
+							<Tooltip
+								{...DefaultTooltipProps}
+								title="Select a level between 1 and 20"
+							>
+								<Slider
+									sx={{ ml: 2, minWidth: 300 }}
+									min={1}
+									max={maxLevel + 1}
+									step={1}
+									marks={true}
+									value={sliderValue}
+									onChange={(_, value) => {
+										setSliderValue(value as number);
+									}}
+									disabled={Boolean(sliderDisabled)}
+								/>
+							</Tooltip>
+							<LevelTo1Button
+								direction="up"
+								onClick={() => {
+									setSliderValue(sliderValue + 1);
+								}}
+								disabled={Boolean(
+									sliderDisabled ||
+										sliderValue >= maxLevel + 1,
+								)}
+							/>
+						</Stack>
+						{sliderValue !== currentDisplayLevel && (
+							<Stack direction="row" alignItems="center">
+								<Typography variant="caption">
+									Change level from{' '}
+									<b>{currentDisplayLevel}</b> to{' '}
+									<b>{sliderValue}</b> ?
+								</Typography>
+								<Button
+									sx={{ ml: 2 }}
+									variant="contained"
+									color="primary"
+									onClick={() => {
+										onApplySliderChange(sliderValue);
+									}}
+								>
+									✔ Apply
+								</Button>
+							</Stack>
+						)}
 					</Stack>
 				</ListItem>
 				<ListItem>
@@ -309,8 +336,6 @@ export default function LevelUpButton({
 		: 0;
 	const timeDisplay = getTimeUntilNextLevelDisplay(nextLevelSec);
 	const expired = nextLevelSec <= 0 || timeDisplay === 'expired';
-	const nextLevel = (learning.level as number) + 1;
-	const prevLevel = (learning.level as number) - 1;
 	const maxLevel = getMaxLevel(learning);
 	const queryClient = useQueryClient();
 	const { mutate: doLevelTo, isPending: isLevelToPending } = useMutation({
@@ -346,10 +371,6 @@ export default function LevelUpButton({
 				<LevelUpCard
 					song={song}
 					learning={learning as SchemaDataRow}
-					nextButtonProps={{
-						disabled: isLevelToPending || nextLevel > maxLevel,
-						onClick: () => doLevelTo(nextLevel),
-					}}
 					confirmGraduate={(learning.level as number) < maxLevel}
 					graduateButtonProps={{
 						disabled: isLevelToPending || isGraduating,
@@ -357,11 +378,7 @@ export default function LevelUpButton({
 							doGraduate();
 						},
 					}}
-					prevButtonProps={{
-						disabled: isLevelToPending || prevLevel < 0,
-						onClick: () => doLevelTo(prevLevel),
-					}}
-					onChangeSlider={(value) => doLevelTo(value - 1)}
+					onApplySliderChange={(value) => doLevelTo(value - 1)}
 					sliderDisabled={isLevelToPending}
 				/>
 			}
