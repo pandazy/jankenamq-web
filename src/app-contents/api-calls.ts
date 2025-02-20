@@ -34,6 +34,68 @@ export async function schema(): Promise<SchemaFamily> {
 	return await res.json();
 }
 
+async function queryWithParents(
+	inputQueryFn: () => Promise<RecordsWithTotal<SchemaDataRowParented>>,
+	parentTypes: string[],
+	getFkColumn: (table: string) => string,
+): Promise<RecordsWithTotal<SchemaDataRowParented>> {
+	const originalResult = await inputQueryFn();
+	if (parentTypes.length <= 0) {
+		return originalResult;
+	}
+	const parentedResult = originalResult.records.map((row) => ({
+		...row,
+		...{
+			$parents: {} as Record<string, SchemaDataRow>,
+		},
+	})) as SchemaDataRowParented[];
+	for (const parentType of parentTypes) {
+		const fk = getFkColumn(parentType);
+		const parentIds = originalResult.records.map(
+			(row) => row[fk] as string,
+		);
+		const { records: parentRows } = await byIds(parentType, parentIds);
+		const parentRowsMap = parentRows.reduce((acc, parent) => {
+			acc[parent.id] = parent;
+			return acc;
+		}, {} as Record<string, SchemaDataRow>);
+		parentedResult.forEach((row) => {
+			if (row.$parents) {
+				const parentId = row[fk] as string;
+				row.$parents[parentType] = parentRowsMap[parentId];
+			}
+		});
+	}
+	return { records: parentedResult, total: originalResult.total };
+}
+
+export function useSchemaQueryFn(
+	basicFetchOptions: {
+		table: string;
+		fillParent?: boolean;
+	},
+	query: UseQueryOptions<RecordsWithTotal<SchemaDataRowParented>> = {
+		queryKey: ['query', basicFetchOptions.table],
+	},
+): () => Promise<RecordsWithTotal<SchemaDataRowParented>> {
+	const { parentNames, pkField } = useSchemaChecks();
+	const { table, fillParent } = basicFetchOptions;
+	const parentTypes = parentNames(table);
+	return async () => {
+		const inputQueryFn = query.queryFn as unknown as () => Promise<
+			RecordsWithTotal<SchemaDataRowParented>
+		>;
+		if (!fillParent) {
+			return await inputQueryFn();
+		}
+		return await queryWithParents(
+			inputQueryFn,
+			parentTypes,
+			(table) => `${table}_${pkField(table).unwrap()}`,
+		);
+	};
+}
+
 export function useSchemaQuery(
 	basicFetchOptions: {
 		table: string;
@@ -43,63 +105,17 @@ export function useSchemaQuery(
 		queryKey: ['query', basicFetchOptions.table],
 	},
 ): UseQueryResult<RecordsWithTotal<SchemaDataRowParented>> {
-	const { verifyTable, parentNames, pkField } = useSchemaChecks();
-	const { table, fillParent } = basicFetchOptions;
-	const verifyTableResult = verifyTable(table);
-	const parentTypes = parentNames(table);
-	const queryFn = async () => {
-		const inputQueryFn = query.queryFn as unknown as () => Promise<
-			RecordsWithTotal<SchemaDataRowParented>
-		>;
-		const originalResult = await inputQueryFn();
-		const parentedResult = originalResult.records.map((row) => ({
-			...row,
-			...(fillParent && parentTypes.length > 0
-				? {
-						$parents: {} as Record<string, SchemaDataRow>,
-				  }
-				: {}),
-		})) as SchemaDataRowParented[];
-		if (fillParent && parentTypes.length > 0) {
-			for (const parentType of parentTypes) {
-				const fk = `${parentType}_${pkField(parentType).unwrap()}`;
-				const parentIds = originalResult.records.map(
-					(row) => row[fk] as string,
-				);
-				const { records: parentRows } = await byIds(
-					parentType,
-					parentIds,
-				);
-				const parentRowsMap = parentRows.reduce((acc, parent) => {
-					acc[parent.id] = parent;
-					return acc;
-				}, {} as Record<string, SchemaDataRow>);
-				parentedResult.forEach((row) => {
-					if (row.$parents) {
-						const parentId = row[fk] as string;
-						row.$parents[parentType] = parentRowsMap[parentId];
-					}
-				});
-			}
-		}
-		return { records: parentedResult, total: originalResult.total };
-	};
+	const { verifyTable } = useSchemaChecks();
+	const queryFn = useSchemaQueryFn(basicFetchOptions, query);
 	const result = useQuery({
 		...query,
 		queryFn,
-		enabled: verifyTableResult.isOk(),
 	});
-	if (!query.queryFn) {
-		return {
-			isError: true,
-			error: new Error('queryFn is required by useSchemaQuery'),
-		} as UseQueryResult<RecordsWithTotal<SchemaDataRowParented>>;
-	}
-	return verifyTableResult.isErr()
+	return verifyTable(basicFetchOptions.table).isErr()
 		? ({
 				...result,
 				isError: true,
-				error: verifyTableResult.unwrapErr(),
+				error: verifyTable(basicFetchOptions.table).unwrapErr(),
 		  } as UseQueryResult<RecordsWithTotal<SchemaDataRowParented>>)
 		: result;
 }

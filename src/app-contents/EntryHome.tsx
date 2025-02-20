@@ -9,10 +9,13 @@ import {
 	RadioGroup,
 	Stack,
 	Typography,
+	Tooltip,
+	Divider,
 } from '@mui/material';
 import { SearchList } from './info/SearchList';
 import { ShowRow } from './info/Show';
 import { ArtistRow } from './info/Artist';
+import { Movie, MusicNote, Person } from '@mui/icons-material';
 
 export default function EntryHome(): ReactElement {
 	const { keyword, exact } = useSearchContext();
@@ -25,60 +28,104 @@ export default function EntryHome(): ReactElement {
 	return (
 		<div>
 			<Frame forRoute="home">
+				<Typography variant="h2">Find things</Typography>
 				<Stack direction="column" sx={{ mt: 2 }}>
-					<GlobalSearch />
-					<RadioGroup
-						value={sourceType}
-						onChange={(e) =>
-							setSourceType(
-								e.target.value as 'show' | 'song' | 'artist',
-							)
-						}
-						row
-					>
-						<FormControlLabel
-							value="show"
-							control={<Radio />}
-							label="Shows"
-						/>
-						<FormControlLabel
-							value="song"
-							control={<Radio />}
-							label="Songs"
-						/>
-						<FormControlLabel
-							value="artist"
-							control={<Radio />}
-							label="Artists"
-						/>
-					</RadioGroup>
-					{sourceType === 'show' && (
+					<Stack direction="row" alignItems="center">
+						<Typography variant="caption" sx={{ mr: 1 }}>
+							Data type:
+						</Typography>
 						<RadioGroup
-							value={showNameCol}
+							value={sourceType}
 							onChange={(e) =>
-								setShowNameCol(
-									e.target.value as 'name' | 'name_romaji',
+								setSourceType(
+									e.target.value as
+										| 'show'
+										| 'song'
+										| 'artist',
 								)
 							}
 							row
+							sx={{ pb: 3 }}
 						>
-							<Stack direction="row" alignItems="center">
-								<Typography variant="caption" sx={{ mr: 1 }}>
-									Search by:
-								</Typography>
-								<FormControlLabel
-									value="name"
-									control={<Radio />}
-									label="Name"
-								/>
-								<FormControlLabel
-									value="name_romaji"
-									control={<Radio />}
-									label="Name (Romaji)"
-								/>
-							</Stack>
+							{[
+								{
+									value: 'show',
+									label: 'Shows',
+									icon: <Movie />,
+								},
+								{
+									value: 'song',
+									label: 'Songs',
+									icon: <MusicNote />,
+								},
+								{
+									value: 'artist',
+									label: 'Artists',
+									icon: <Person />,
+								},
+							].map(({ value, label, icon }, i) => (
+								<Tooltip
+									title={label}
+									id={`${value}-search-radio-data-type-${i}`}
+									key={i}
+								>
+									<FormControlLabel
+										value={value}
+										control={<Radio />}
+										aria-labelledby={`${value}-tooltip-${i}`}
+										sx={{
+											flexDirection: 'column',
+											minHeight: 'fit-content',
+										}}
+										label={
+											<Stack
+												direction="row"
+												alignItems="center"
+											>
+												{icon}
+											</Stack>
+										}
+									/>
+								</Tooltip>
+							))}
 						</RadioGroup>
+					</Stack>
+					{sourceType === 'show' && (
+						<>
+							<Divider sx={{ my: 2 }} />
+							<RadioGroup
+								value={showNameCol}
+								onChange={(e) =>
+									setShowNameCol(
+										e.target.value as
+											| 'name'
+											| 'name_romaji',
+									)
+								}
+								row
+							>
+								<Stack direction="row" alignItems="center">
+									<Typography
+										variant="caption"
+										sx={{ mr: 1 }}
+									>
+										Search by:
+									</Typography>
+									<FormControlLabel
+										value="name"
+										control={<Radio />}
+										label="Name"
+									/>
+									<FormControlLabel
+										value="name_romaji"
+										control={<Radio />}
+										label="Name (Romaji)"
+									/>
+								</Stack>
+							</RadioGroup>
+						</>
 					)}
+					<GlobalSearch />
 					<SearchList
 						source={[
 							sourceType,

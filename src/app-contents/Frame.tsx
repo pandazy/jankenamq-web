@@ -1,5 +1,5 @@
 import { RouteType, RouteConf } from './route-conf';
-import { learningSummary } from './info/learning/api-calls';
+import { learningSummary, totalDueLearning } from './info/learning/api-calls';
 import { QueryKeys } from './info/query-keys';
 
 import { AnimatedLoadingBar, AvatarNav } from '@pandazy/jankenstore-client-web';
@@ -27,13 +27,25 @@ function commonBadgeProps(count: number): Omit<BadgeProps, 'children'> {
 
 function SummaryBoard() {
 	const { data: summary, isLoading } = useQuery({
-		queryKey: [QueryKeys.learning, 'summary'],
+		queryKey: [
+			QueryKeys.learning,
+			QueryKeys.artist,
+			QueryKeys.show,
+			QueryKeys.song,
+			'summary',
+		],
 		queryFn: () => learningSummary(),
+	});
+	const { data: totalDue, isLoading: totalDueLoading } = useQuery({
+		queryKey: [QueryKeys.learning, 'totalDueLearning'],
+		queryFn: () => totalDueLearning(),
+		refetchInterval: 2000,
+		refetchIntervalInBackground: true,
 	});
 
 	return (
 		<Stack spacing={2}>
-			<AnimatedLoadingBar isLoading={isLoading} />
+			<AnimatedLoadingBar isLoading={isLoading || totalDueLoading} />
 			<Stack direction="row" spacing={2}>
 				<Tooltip
 					title={
@@ -42,13 +54,10 @@ function SummaryBoard() {
 						</>
 					}
 				>
-					<Badge
-						{...commonBadgeProps(
-							summary?.totalDueLearningSongs ?? 0,
-						)}
-						color="warning"
-					>
-						<AccessTimeTwoTone color="warning" />
+					<Badge {...commonBadgeProps(totalDue ?? 0)} color="warning">
+						<AccessTimeTwoTone
+							color={totalDue ? 'warning' : 'disabled'}
+						/>
 					</Badge>
 				</Tooltip>
 				<Tooltip
@@ -131,6 +140,7 @@ export default function Frame({
 			<Stack
 				direction={{ xs: 'column', md: 'row' }}
 				justifyContent="space-between"
+				sx={{ mb: 3 }}
 			>
 				<AvatarNav<RouteType>
 					current={forRoute}

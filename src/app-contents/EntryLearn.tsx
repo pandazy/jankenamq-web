@@ -1,45 +1,31 @@
-import { dueLearning, useLearningMap } from './info/learning/api-calls';
+import DueLearningList from './info/learning/DueLearningList';
+import AllLearningList from './info/learning/AllLearningList';
 import Frame from './Frame';
-import { SchemaDataRowParented, useSchemaQuery } from './api-calls';
-import { QueryKeys } from './info/query-keys';
-import { SongRow } from './info/Song';
 
-import { DataList } from '@pandazy/jankenstore-client-web';
+import { Tab, Tabs, Typography } from '@mui/material';
 
-import { ReactElement } from 'react';
+import { ReactElement, useState } from 'react';
+import { Alarm, Schedule } from '@mui/icons-material';
 
 export default function EntryLearn(): ReactElement {
-	const { data, isLoading } = useSchemaQuery(
-		{
-			table: 'learning',
-			fillParent: true,
-		},
-		{
-			queryKey: [QueryKeys.learning],
-			queryFn: async () => dueLearning(),
-		},
-	);
-	const songIds = data?.records.map((learning) => learning.song_id) ?? [];
-	const { data: learningMap, isLoading: learningIsLoading } = useLearningMap(
-		songIds as string[],
-	);
+	const [tab, setTab] = useState<'due' | 'all'>('due');
 	return (
 		<Frame forRoute="learn">
-			<h1>Learning songs</h1>
-			<DataList
-				data={data?.records ?? []}
-				isLoading={isLoading || learningIsLoading}
-				makeItemContent={(item: SchemaDataRowParented) => {
-					return (
-						<SongRow
-							song={item.$parents?.song as SchemaDataRowParented}
-							learning={
-								learningMap?.[item.$parents?.song.id as string]
-							}
-						/>
-					);
-				}}
-			/>
+			<Typography variant="h2">Learning songs</Typography>
+			<Tabs value={tab} onChange={(_, value) => setTab(value)}>
+				<Tab
+					icon={<Alarm color="warning" />}
+					value="due"
+					label={
+						<Typography color="warning" variant="caption">
+							Due
+						</Typography>
+					}
+				/>
+				<Tab icon={<Schedule />} value="all" label="All" />
+			</Tabs>
+			{tab === 'due' && <DueLearningList />}
+			{tab === 'all' && <AllLearningList />}
 		</Frame>
 	);
 }

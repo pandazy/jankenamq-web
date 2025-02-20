@@ -22,11 +22,8 @@ export async function allLearnings(
 	limit: number = 10,
 	offset: number = 0,
 ): Promise<RecordsWithTotal<SchemaDataRow>> {
-	const url = new URL(`${ADDR}/store_read`);
+	const url = new URL(`${ADDR}/all_learning`);
 	Object.entries({
-		op: JSON.stringify({
-			All: 'learning',
-		}),
 		limit,
 		offset,
 		order_by: orderBy,
@@ -123,6 +120,14 @@ export async function learningSummary(): Promise<{
 	return await res.json();
 }
 
+export async function totalDueLearning(): Promise<number> {
+	const url = new URL(`${ADDR}/total_due_learning`);
+	const res = await fetch(url, {
+		method: 'GET',
+		headers: CommonHeaders,
+	});
+	return (await res.json()).total;
+}
 export function useLearnTheSong(songId: string) {
 	const queryClient = useQueryClient();
 	return useMutation({
