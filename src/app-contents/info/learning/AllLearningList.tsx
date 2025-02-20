@@ -6,10 +6,22 @@ import { SchemaDataRowParented } from '~/app-contents/api-calls';
 import { DataList } from '@pandazy/jankenstore-client-web';
 
 import { Badge, Typography } from '@mui/material';
-import { ReactElement } from 'react';
+import { ReactElement, useState } from 'react';
+import { usePagination } from '~/app-contents/util-hooks';
+import { Paginator } from '~/app-contents/info/Paginator';
 
 export default function AllLearningList(): ReactElement {
-	const { data, isLoading } = useLearningQuery(async () => allLearnings());
+	const limit = 10;
+	const [offset, setOffset] = useState(0);
+	const { data, isLoading } = useLearningQuery({
+		queryFn: async () => allLearnings({ limit, offset }),
+		queryKeys: [offset, limit],
+	});
+	const { page, turnToPage, totalPages } = usePagination(
+		data?.total ?? 0,
+		setOffset,
+		limit,
+	);
 
 	return (
 		<>
@@ -22,6 +34,14 @@ export default function AllLearningList(): ReactElement {
 					All learning songs
 				</Badge>
 			</Typography>
+			{totalPages > 1 && (
+				<Paginator
+					total={data?.total ?? 0}
+					page={page}
+					turnToPage={turnToPage}
+					totalPages={totalPages}
+				/>
+			)}
 			<DataList
 				data={data?.records ?? []}
 				isLoading={isLoading}

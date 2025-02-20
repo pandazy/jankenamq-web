@@ -19,11 +19,15 @@ import {
 	UseQueryResult,
 } from '@tanstack/react-query';
 
-export async function allLearnings(
-	orderBy: string = 'level,created_at desc',
-	limit: number = 10,
-	offset: number = 0,
-): Promise<RecordsWithTotal<SchemaDataRow>> {
+export async function allLearnings({
+	orderBy = 'level,created_at desc',
+	limit = 10,
+	offset = 0,
+}: {
+	orderBy?: string;
+	limit?: number;
+	offset?: number;
+}): Promise<RecordsWithTotal<SchemaDataRow>> {
 	const url = new URL(`${ADDR}/all_learning`);
 	Object.entries({
 		limit,
@@ -119,17 +123,22 @@ export function useLearnTheSong(songId: string) {
 	});
 }
 
-export function useLearningQuery(
-	queryFn: () => Promise<RecordsWithTotal<SchemaDataRowParented>>,
-	enabled: boolean = true,
-): UseQueryResult<RecordsWithTotal<SchemaDataRowParented>> {
+export function useLearningQuery({
+	queryFn,
+	enabled = true,
+	queryKeys = [],
+}: {
+	queryFn: () => Promise<RecordsWithTotal<SchemaDataRowParented>>;
+	enabled?: boolean;
+	queryKeys?: string | number[];
+}): UseQueryResult<RecordsWithTotal<SchemaDataRowParented>> {
 	const learningQueryResults = useSchemaQuery(
 		{
 			table: 'learning',
 			fillParent: true,
 		},
 		{
-			queryKey: [QueryKeys.learning, QueryKeys.song, 'all'],
+			queryKey: [QueryKeys.learning, QueryKeys.song, 'all', ...queryKeys],
 			queryFn,
 			enabled,
 		},
