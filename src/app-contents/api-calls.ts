@@ -34,24 +34,24 @@ export async function schema(): Promise<SchemaFamily> {
 	return await res.json();
 }
 
-async function queryWithParents(
-	inputQueryFn: () => Promise<RecordsWithTotal<SchemaDataRowParented>>,
+export async function extractParents(
+	originalRecords: RecordsWithTotal<SchemaDataRowParented>,
 	parentTypes: string[],
-	getFkColumn: (table: string) => string,
+	getPkColumn: (table: string) => string,
 ): Promise<RecordsWithTotal<SchemaDataRowParented>> {
-	const originalResult = await inputQueryFn();
 	if (parentTypes.length <= 0) {
-		return originalResult;
+		return Promise.resolve(originalRecords);
 	}
-	const parentedResult = originalResult.records.map((row) => ({
+
+	const parentedResult = originalRecords.records.map((row) => ({
 		...row,
 		...{
 			$parents: {} as Record<string, SchemaDataRow>,
 		},
 	})) as SchemaDataRowParented[];
 	for (const parentType of parentTypes) {
-		const fk = getFkColumn(parentType);
-		const parentIds = originalResult.records.map(
+		const fk = `${parentType}_${getPkColumn(parentType)}`;
+		const parentIds = originalRecords.records.map(
 			(row) => row[fk] as string,
 		);
 		const { records: parentRows } = await byIds(parentType, parentIds);
@@ -66,7 +66,7 @@ async function queryWithParents(
 			}
 		});
 	}
-	return { records: parentedResult, total: originalResult.total };
+	return { records: parentedResult, total: originalRecords.total };
 }
 
 export function useSchemaQueryFn(
@@ -85,13 +85,12 @@ export function useSchemaQueryFn(
 		const inputQueryFn = query.queryFn as unknown as () => Promise<
 			RecordsWithTotal<SchemaDataRowParented>
 		>;
+		const results = await inputQueryFn();
 		if (!fillParent) {
-			return await inputQueryFn();
+			return results;
 		}
-		return await queryWithParents(
-			inputQueryFn,
-			parentTypes,
-			(table) => `${table}_${pkField(table).unwrap()}`,
+		return extractParents(results, parentTypes, (table) =>
+			pkField(table).unwrap(),
 		);
 	};
 }

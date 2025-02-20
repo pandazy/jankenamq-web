@@ -28,7 +28,9 @@ export default function EntryHome(): ReactElement {
 	return (
 		<div>
 			<Frame forRoute="home">
-				<Typography variant="h2">Find things</Typography>
+				<Typography variant="h3" component="p">
+					Find things
+				</Typography>
 				<Stack direction="column" sx={{ mt: 2 }}>
 					<Stack direction="row" alignItems="center">
 						<Typography variant="caption" sx={{ mr: 1 }}>
@@ -45,23 +47,33 @@ export default function EntryHome(): ReactElement {
 								)
 							}
 							row
-							sx={{ pb: 3 }}
+							sx={{ pb: 3, ml: 2 }}
 						>
 							{[
 								{
 									value: 'show',
 									label: 'Shows',
-									icon: <Movie />,
+									icon: (
+										<Movie sx={{ width: 48, height: 48 }} />
+									),
 								},
 								{
 									value: 'song',
 									label: 'Songs',
-									icon: <MusicNote />,
+									icon: (
+										<MusicNote
+											sx={{ width: 48, height: 48 }}
+										/>
+									),
 								},
 								{
 									value: 'artist',
 									label: 'Artists',
-									icon: <Person />,
+									icon: (
+										<Person
+											sx={{ width: 48, height: 48 }}
+										/>
+									),
 								},
 							].map(({ value, label, icon }, i) => (
 								<Tooltip

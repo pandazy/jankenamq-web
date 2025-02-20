@@ -11,7 +11,9 @@ export default function EntryLearn(): ReactElement {
 	const [tab, setTab] = useState<'due' | 'all'>('due');
 	return (
 		<Frame forRoute="learn">
-			<Typography variant="h2">Learning songs</Typography>
+			<Typography variant="h3" component="p">
+				Learn songs
+			</Typography>
 			<Tabs value={tab} onChange={(_, value) => setTab(value)}>
 				<Tab
 					icon={<Alarm color="warning" />}

@@ -1,7 +1,7 @@
 import SongRow from './SongRow';
 
 import { SchemaDataRowParented } from '~/app-contents/api-calls';
-import { useLearningMap } from '~/app-contents/info/learning/api-calls';
+import { useLearningOfSongsMap } from '~/app-contents/info/learning/api-calls';
 
 import { DataList, useSchemaChecks } from '@pandazy/jankenstore-client-web';
 
@@ -17,7 +17,7 @@ export default function SongList({
 		(song) => song[pkField('song').unwrap()],
 	) as string[];
 	const { data: learningMap, isLoading: learningIsLoading } =
-		useLearningMap(songIds);
+		useLearningOfSongsMap(songIds);
 
 	return (
 		<>
