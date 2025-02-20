@@ -107,6 +107,15 @@ export async function levelTo(
 	await res.json();
 }
 
+export async function graduate(learningId: string): Promise<void> {
+	const url = new URL(`${ADDR}/graduate/${learningId}`);
+	const res = await fetch(url, {
+		method: 'PATCH',
+		headers: CommonHeaders,
+	});
+	await res.json();
+}
+
 // HOOKS BELOW ================================
 
 export function useLearnTheSong(songId: string) {

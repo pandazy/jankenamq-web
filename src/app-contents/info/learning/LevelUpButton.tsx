@@ -10,7 +10,13 @@ import {
 	Avatar,
 	Badge,
 	Button,
+	ButtonProps,
 	Chip,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogContentText,
+	DialogTitle,
 	List,
 	ListItem,
 	Slider,
@@ -22,12 +28,13 @@ import {
 	AccessTimeTwoTone,
 	ArrowDownward,
 	ArrowUpward,
+	DoubleArrowTwoTone,
 	MilitaryTech,
+	SchoolTwoTone,
 } from '@mui/icons-material';
-
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement, ReactNode, useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { levelTo } from './api-calls';
+import { graduate, levelTo } from './api-calls';
 import { QueryKeys } from '../query-keys';
 
 function getMaxLevel(learning: SchemaDataRow) {
@@ -115,6 +122,8 @@ export interface LevelUpCardProps {
 	prevButtonProps: Omit<LevelTo1ButtonProps, 'direction'>;
 	onChangeSlider: (value: number) => void;
 	sliderDisabled?: boolean;
+	graduateButtonProps?: ButtonProps;
+	confirmGraduate?: boolean;
 }
 
 export function LevelUpCard({
@@ -124,14 +133,33 @@ export function LevelUpCard({
 	prevButtonProps,
 	onChangeSlider,
 	sliderDisabled,
+	graduateButtonProps,
+	confirmGraduate = true,
 }: LevelUpCardProps): ReactElement {
 	const [displayLevel, setDisplayLevel] = useState(
 		(learning.level as number) + 1,
 	);
+	const maxLevel = getMaxLevel(learning);
 	useEffect(() => {
 		setDisplayLevel((learning.level as number) + 1);
-	}, [learning.level]);
+		if (learning.level === maxLevel) {
+			setDialogContent(
+				<Stack alignItems="center">
+					<b>{song.name}</b>'s level is&nbsp; <b>maxed out</b>
+					<br />
+					<Stack direction="row" alignItems="center">
+						Graduate
+						<SchoolTwoTone />?
+					</Stack>
+				</Stack>,
+			);
+			setConfirmGraduateDialogOpen(true);
+		}
+	}, [learning.level, maxLevel, song.name]);
 
+	const [confirmGraduateDialogOpen, setConfirmGraduateDialogOpen] =
+		useState(false);
+	const [dialogContent, setDialogContent] = useState<ReactNode>(null);
 	return (
 		<PopCard
 			header={
@@ -140,6 +168,30 @@ export function LevelUpCard({
 				</>
 			}
 		>
+			<Dialog
+				open={confirmGraduateDialogOpen}
+				onClose={() => setConfirmGraduateDialogOpen(false)}
+			>
+				<DialogTitle>Want to graduate?</DialogTitle>
+				<DialogContent>
+					<DialogContentText>{dialogContent}</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={() => setConfirmGraduateDialogOpen(false)}>
+						Cancel
+					</Button>
+					<Button
+						variant="contained"
+						color="primary"
+						onClick={(e) => {
+							setConfirmGraduateDialogOpen(false);
+							graduateButtonProps?.onClick?.(e);
+						}}
+					>
+						✓ OK
+					</Button>
+				</DialogActions>
+			</Dialog>
 			<List>
 				<ListItem>
 					<Stack>
@@ -174,7 +226,7 @@ export function LevelUpCard({
 							<Slider
 								sx={{ ml: 2, minWidth: 300 }}
 								min={1}
-								max={getMaxLevel(learning) + 1}
+								max={maxLevel + 1}
 								step={1}
 								marks={true}
 								value={displayLevel}
@@ -191,6 +243,45 @@ export function LevelUpCard({
 							disabled={nextButtonProps.disabled}
 						/>
 					</Stack>
+				</ListItem>
+				<ListItem>
+					<Tooltip
+						{...DefaultTooltipProps}
+						title="Complete the learning of the song"
+					>
+						{!confirmGraduate ? (
+							<Button
+								variant="outlined"
+								component={
+									graduateButtonProps?.disabled
+										? 'div'
+										: 'button'
+								}
+								onClick={graduateButtonProps?.onClick}
+								disabled={graduateButtonProps?.disabled}
+							>
+								<SchoolTwoTone />
+								<DoubleArrowTwoTone />
+							</Button>
+						) : (
+							<Button
+								variant="outlined"
+								onClick={() => {
+									setDialogContent(
+										<>
+											Your level is <b>NOT maxed out</b>{' '}
+											yet. Are you sure you want to
+											graduate?
+										</>,
+									);
+									setConfirmGraduateDialogOpen(true);
+								}}
+							>
+								<SchoolTwoTone />
+								<DoubleArrowTwoTone />
+							</Button>
+						)}
+					</Tooltip>
 				</ListItem>
 			</List>
 		</PopCard>
@@ -215,7 +306,7 @@ export default function LevelUpButton({
 	const prevLevel = (learning.level as number) - 1;
 	const maxLevel = getMaxLevel(learning);
 	const queryClient = useQueryClient();
-	const { mutate, isPending, isSuccess } = useMutation({
+	const { mutate: doLevelTo, isPending: isLevelToPending } = useMutation({
 		mutationFn: (targetLevel: number) =>
 			levelTo(learning.id as string, targetLevel),
 		onSuccess: () => {
@@ -229,25 +320,42 @@ export default function LevelUpButton({
 			});
 		},
 	});
+	const { mutate: doGraduate, isPending: isGraduating } = useMutation({
+		mutationFn: () => graduate(learning.id as string),
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				predicate: (query) =>
+					query.queryKey.some(
+						(key) =>
+							key === QueryKeys.learning ||
+							key === QueryKeys.song,
+					),
+			});
+		},
+	});
 	return (
 		<PopButton
-			popoverProps={{
-				open: !isSuccess,
-			}}
 			popoverContent={
 				<LevelUpCard
 					song={song}
 					learning={learning as SchemaDataRow}
 					nextButtonProps={{
-						disabled: isPending || nextLevel > maxLevel,
-						onClick: () => mutate(nextLevel),
+						disabled: isLevelToPending || nextLevel > maxLevel,
+						onClick: () => doLevelTo(nextLevel),
+					}}
+					confirmGraduate={(learning.level as number) < maxLevel}
+					graduateButtonProps={{
+						disabled: isLevelToPending || isGraduating,
+						onClick: () => {
+							doGraduate();
+						},
 					}}
 					prevButtonProps={{
-						disabled: isPending || prevLevel < 0,
-						onClick: () => mutate(prevLevel),
+						disabled: isLevelToPending || prevLevel < 0,
+						onClick: () => doLevelTo(prevLevel),
 					}}
-					onChangeSlider={(value) => mutate(value - 1)}
-					sliderDisabled={isPending}
+					onChangeSlider={(value) => doLevelTo(value - 1)}
+					sliderDisabled={isLevelToPending}
 				/>
 			}
 		>
