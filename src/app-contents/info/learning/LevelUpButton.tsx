@@ -1,4 +1,7 @@
+import { graduate, levelTo } from './api-calls';
+
 import { DefaultTooltipProps } from '~/app-contents/utils-component';
+import { QueryKeys } from '~/app-contents/info/query-keys';
 
 import {
 	PopButton,
@@ -7,6 +10,7 @@ import {
 } from '@pandazy/jankenstore-client-web';
 
 import {
+	Alert,
 	Avatar,
 	Badge,
 	Button,
@@ -24,6 +28,7 @@ import {
 	Tooltip,
 	Typography,
 } from '@mui/material';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
 	AccessTimeTwoTone,
 	ArrowDownward,
@@ -33,9 +38,6 @@ import {
 	SchoolTwoTone,
 } from '@mui/icons-material';
 import { ReactElement, ReactNode, useEffect, useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { graduate, levelTo } from './api-calls';
-import { QueryKeys } from '../query-keys';
 
 function getMaxLevel(learning: SchemaDataRow) {
 	const pathArray = JSON.parse(learning.level_up_path as string);
@@ -145,8 +147,10 @@ export function LevelUpCard({
 		if (learning.level === maxLevel) {
 			setDialogContent(
 				<Stack alignItems="center">
-					<b>{song.name}</b>'s level is&nbsp; <b>maxed out</b>
-					<br />
+					<Alert severity="success">
+						<b>{song.name}</b>'s level is&nbsp; <b>maxed out</b>
+						<br />
+					</Alert>
 					<Stack direction="row" alignItems="center">
 						Graduate
 						<SchoolTwoTone />?
@@ -269,9 +273,12 @@ export function LevelUpCard({
 								onClick={() => {
 									setDialogContent(
 										<>
-											Your level is <b>NOT maxed out</b>{' '}
-											yet. Are you sure you want to
-											graduate?
+											<Alert severity="warning">
+												Your level is{' '}
+												<b>NOT maxed out</b> yet.
+												<br />
+											</Alert>
+											Are you sure you want to graduate?
 										</>,
 									);
 									setConfirmGraduateDialogOpen(true);
