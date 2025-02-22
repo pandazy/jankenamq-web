@@ -3,6 +3,7 @@ import CertainRecords from './import/CertainRecords';
 import { useAmqExportContext } from './import/AmqExportContext';
 import { addPlayHistory, getImportCheck } from './import/api-calls';
 import Frame from './Frame';
+import amqExportExample from '/AMQ_export_example.png';
 
 import {
 	Stack,
@@ -19,8 +20,15 @@ import {
 	Divider,
 	DialogActions,
 	CircularProgress,
+	Link,
+	Paper,
 } from '@mui/material';
-import { AttachFileTwoTone, Block, Delete } from '@mui/icons-material';
+import {
+	AttachFileTwoTone,
+	Block,
+	Delete,
+	TipsAndUpdatesTwoTone,
+} from '@mui/icons-material';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ReactElement, useState } from 'react';
 
@@ -158,58 +166,99 @@ export default function EntryImport(): ReactElement {
 			<Typography variant="h3">
 				Import AMQ Export records to database
 			</Typography>
-			<Stack spacing={2} sx={{ mt: 2 }}>
+			<Stack spacing={2} sx={{ mt: 2 }} alignItems="center">
 				{(amqExport?.songs?.length ?? 0) > 0 && (
 					<Stack direction="row" spacing={2} justifyContent="end">
 						<ClearSheetButton />
 					</Stack>
 				)}
 				{(amqExport?.songs?.length ?? 0) === 0 && (
-					<Box
-						onDragEnter={handleDrag}
-						onDragLeave={handleDrag}
-						onDragOver={handleDrag}
-						onDrop={handleDrop}
-						onClick={() =>
-							document.getElementById('file-upload')?.click()
-						}
-						sx={{
-							width: '100%',
-							height: 200,
-							border: '2px dashed',
-							borderColor: dragActive
-								? 'primary.main'
-								: 'grey.300',
-							borderRadius: 1,
-							display: 'flex',
-							flexDirection: 'column',
-							alignItems: 'center',
-							justifyContent: 'center',
-							backgroundColor: dragActive
-								? 'action.hover'
-								: 'background.paper',
-							cursor: 'pointer',
-						}}
-					>
-						<AttachFileTwoTone
-							sx={{ fontSize: 48, color: 'primary.main', mb: 1 }}
-						/>
-						<Typography>
-							Drag and drop files here or click to select files
-						</Typography>
-						<input
-							type="file"
-							multiple
-							onChange={(e) => {
-								onLoadFile(
-									e.target.files || new FileList(),
-									updateAmqExport,
-								);
+					<>
+						<Box
+							onDragEnter={handleDrag}
+							onDragLeave={handleDrag}
+							onDragOver={handleDrag}
+							onDrop={handleDrop}
+							onClick={() =>
+								document.getElementById('file-upload')?.click()
+							}
+							sx={{
+								width: '100%',
+								height: 200,
+								border: '2px dashed',
+								borderColor: dragActive
+									? 'primary.main'
+									: 'grey.300',
+								borderRadius: 1,
+								display: 'flex',
+								flexDirection: 'column',
+								alignItems: 'center',
+								justifyContent: 'center',
+								backgroundColor: dragActive
+									? 'action.hover'
+									: 'background.paper',
+								cursor: 'pointer',
 							}}
-							style={{ display: 'none' }}
-							id="file-upload"
-						/>
-					</Box>
+						>
+							<AttachFileTwoTone
+								sx={{
+									fontSize: 48,
+									color: 'primary.main',
+									mb: 1,
+								}}
+							/>
+							<Typography>
+								Drag and drop files here or click to select
+								files
+							</Typography>
+							<input
+								type="file"
+								multiple
+								onChange={(e) => {
+									onLoadFile(
+										e.target.files || new FileList(),
+										updateAmqExport,
+									);
+								}}
+								style={{ display: 'none' }}
+								id="file-upload"
+							/>
+						</Box>
+						<Paper
+							sx={{
+								p: 2,
+								width: 'fit-content',
+							}}
+						>
+							<Link href={amqExportExample} target="_blank">
+								<Stack
+									direction="column"
+									spacing={2}
+									alignItems="center"
+								>
+									<Stack
+										direction="row"
+										spacing={2}
+										alignItems="center"
+									>
+										<TipsAndUpdatesTwoTone />
+										<span>
+											Check the image below for how to get
+											the files to upload
+										</span>
+									</Stack>
+									<img
+										src={amqExportExample}
+										alt="AMQ Export Example"
+										style={{
+											maxHeight: '100px',
+											width: 'fit-content',
+										}}
+									/>
+								</Stack>
+							</Link>
+						</Paper>
+					</>
 				)}
 				<Stack spacing={2}>
 					<AnimatedLoadingBar
