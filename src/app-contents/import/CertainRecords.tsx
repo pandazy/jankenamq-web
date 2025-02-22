@@ -12,7 +12,7 @@ import {
 import { Paper, Stack } from '@mui/material';
 import { useState } from 'react';
 
-export default function ImportStraightRecords({
+export default function CertainRecords({
 	records,
 }: {
 	records: {
@@ -31,12 +31,14 @@ export default function ImportStraightRecords({
 	return (
 		<Stack spacing={2}>
 			<AnimatedLoadingBar isLoading={isFetching} />
-			<Paginator
-				total={records.length}
-				page={currentRecordNo}
-				turnToPage={(page) => setCurrentRecordNo(page)}
-				totalPages={records.length}
-			/>
+			{records.length > 1 && (
+				<Paginator
+					total={records.length}
+					page={currentRecordNo}
+					turnToPage={(page) => setCurrentRecordNo(page)}
+					totalPages={records.length}
+				/>
+			)}
 			<Stack spacing={2} sx={{ width: 'fit-content' }}>
 				<ShowRow show={show} />
 				<SongRow

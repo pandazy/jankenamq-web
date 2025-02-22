@@ -6,12 +6,12 @@ export async function getImportCheck(
 	songs: AmqExportSong[],
 	dupArtistMap?: Record<string, string>,
 ): Promise<{
-	straightRecords: {
+	certainRecords: {
 		show: SchemaDataRow;
 		artist: SchemaDataRow;
 		song: SchemaDataRow;
 	}[];
-	toBeDecidedRecords: {
+	uncertainRecords: {
 		show: TbdShow | SchemaDataRow;
 		song: TbdSong | SchemaDataRow;
 		artist: TbdArtist | SchemaDataRow;

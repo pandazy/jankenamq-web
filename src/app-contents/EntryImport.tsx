@@ -1,5 +1,5 @@
-import ImportToBeDecidedRecords from './import/ImportToBeDecidedRecords';
-import ImportStraightRecords from './import/ImportStraightRecords';
+import UncertainRecords from './import/UncertainRecords';
+import CertainRecords from './import/CertainRecords';
 import { useAmqExportContext } from './import/AmqExportContext';
 import { addPlayHistory, getImportCheck } from './import/api-calls';
 import Frame from './Frame';
@@ -18,8 +18,9 @@ import {
 	Alert,
 	Divider,
 	DialogActions,
+	CircularProgress,
 } from '@mui/material';
-import { AttachFileTwoTone, Delete } from '@mui/icons-material';
+import { AttachFileTwoTone, Block, Delete } from '@mui/icons-material';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ReactElement, useState } from 'react';
 
@@ -93,8 +94,12 @@ function onLoadFile(
 }
 
 export default function EntryImport(): ReactElement {
-	const { updateAmqExport, amqExport, dupArtistIdMap } =
+	const { updateAmqExport, amqExport, dupArtistIdMap, clearAmqExport } =
 		useAmqExportContext();
+
+	console.log({
+		dupArtistIdMap,
+	});
 
 	const [dragActive, setDragActive] = useState(false);
 
@@ -119,7 +124,11 @@ export default function EntryImport(): ReactElement {
 	};
 
 	const { data: importCheck, isFetching: isLoadingImportCheck } = useQuery({
-		queryKey: ['import-check', amqExport?.songs],
+		queryKey: [
+			'import-check',
+			amqExport?.songs,
+			Object.keys(dupArtistIdMap),
+		],
 		queryFn: () => getImportCheck(amqExport?.songs || [], dupArtistIdMap),
 		enabled: !!amqExport?.songs?.length,
 	});
@@ -140,6 +149,9 @@ export default function EntryImport(): ReactElement {
 				})),
 			),
 	});
+
+	const uncertainRecords = importCheck?.uncertainRecords ?? [];
+	const certainRecords = importCheck?.certainRecords ?? [];
 
 	return (
 		<Frame forRoute="import">
@@ -203,7 +215,11 @@ export default function EntryImport(): ReactElement {
 					<AnimatedLoadingBar
 						isLoading={isLoadingImportCheck || isLoadingAddHistory}
 					/>
-					{(importCheck?.straightRecords?.length ?? 0) > 1 && (
+
+					{uncertainRecords.length > 0 && (
+						<UncertainRecords records={uncertainRecords} />
+					)}
+					{certainRecords.length > 0 && (
 						<Card>
 							<CardHeader
 								sx={{
@@ -212,40 +228,70 @@ export default function EntryImport(): ReactElement {
 								}}
 								title={
 									<Stack direction="row" alignItems="center">
-										<Typography>
-											Do you want to add records in this
-											card to Play History?
+										<Typography component="div">
+											<Stack
+												direction="row"
+												alignItems="center"
+											>
+												<CircularProgress
+													size={32}
+													color="info"
+													sx={{
+														mr: 1,
+														color: 'white',
+													}}
+													variant="determinate"
+													thickness={10}
+													value={
+														(certainRecords.length /
+															(certainRecords.length +
+																uncertainRecords.length)) *
+														100
+													}
+												/>
+												{uncertainRecords.length > 0 ? (
+													<>
+														Before going any
+														further, address the
+														issues above{' '}
+													</>
+												) : (
+													"Let's add these records to Play History!"
+												)}
+											</Stack>
 										</Typography>
 										<Button
 											variant="contained"
+											disabled={
+												uncertainRecords.length > 0
+											}
 											sx={{
 												ml: 2,
 												backgroundColor: 'grey.100',
+												'&:disabled': {
+													backgroundColor: 'grey.100',
+													color: 'grey.500',
+												},
 												color: 'grey.900',
 											}}
 											onClick={() => {
-												addHistory(
-													importCheck?.straightRecords ??
-														[],
-												);
+												addHistory(certainRecords);
+												clearAmqExport();
 											}}
 										>
-											Add
+											{uncertainRecords.length > 0 ? (
+												<Block />
+											) : (
+												'OK'
+											)}
 										</Button>
 									</Stack>
 								}
 							/>
 							<CardContent>
-								<ImportStraightRecords
-									records={importCheck?.straightRecords ?? []}
-								/>
+								<CertainRecords records={certainRecords} />
 							</CardContent>
 						</Card>
-					)}
-					{(importCheck?.toBeDecidedRecords?.length ?? 0) > 0 && (
-						<ImportToBeDecidedRecords
-							records={importCheck?.toBeDecidedRecords ?? []}
-						/>
 					)}
 				</Stack>
 			</Stack>

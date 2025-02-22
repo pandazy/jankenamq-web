@@ -25,13 +25,13 @@ export function useAmqExportContext() {
 	return useContext(AmqExportContext);
 }
 
-export function AmqExportProvider({ children }: { children: React.ReactNode }) {
-	const localStorageKey = 'amqExport';
-	const localStorageKeySelectedDupArtistIdMap = 'selectedDupArtistIdMap';
+const LocalStorageKey = 'amqExport';
+const LocalStorageKeySelectedDupArtistIdMap = 'selectedDupArtistIdMap';
 
-	const localStorageValue = localStorage.getItem(localStorageKey);
+export function AmqExportProvider({ children }: { children: React.ReactNode }) {
+	const localStorageValue = localStorage.getItem(LocalStorageKey);
 	const localStorageValueSelectedDupArtistIdMap = localStorage.getItem(
-		localStorageKeySelectedDupArtistIdMap,
+		LocalStorageKeySelectedDupArtistIdMap,
 	);
 
 	const [amqExport, setAmqExport] = useState<AmqExportSheet | undefined>(
@@ -56,7 +56,7 @@ export function AmqExportProvider({ children }: { children: React.ReactNode }) {
 				[name]: selectedDuplicateArtistId ?? '',
 			};
 			localStorage.setItem(
-				localStorageKeySelectedDupArtistIdMap,
+				LocalStorageKeySelectedDupArtistIdMap,
 				JSON.stringify(newMap),
 			);
 			return newMap;
@@ -65,7 +65,7 @@ export function AmqExportProvider({ children }: { children: React.ReactNode }) {
 
 	const updateAmqExport = (amqExport: AmqExportSheet) => {
 		setAmqExport(amqExport);
-		localStorage.setItem(localStorageKey, JSON.stringify(amqExport));
+		localStorage.setItem(LocalStorageKey, JSON.stringify(amqExport));
 	};
 
 	const getSelectedDuplicateArtistId = (name: string) => {
@@ -74,8 +74,9 @@ export function AmqExportProvider({ children }: { children: React.ReactNode }) {
 
 	const clearAmqExport = () => {
 		setAmqExport(undefined);
-		localStorage.removeItem(localStorageKey);
-		localStorage.removeItem(localStorageKeySelectedDupArtistIdMap);
+		setDupArtistIdMap({});
+		localStorage.removeItem(LocalStorageKey);
+		localStorage.removeItem(LocalStorageKeySelectedDupArtistIdMap);
 	};
 
 	return (

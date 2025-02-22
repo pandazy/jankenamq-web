@@ -7,7 +7,7 @@ import { Paginator } from '~/app-contents/info/Paginator';
 import { SchemaDataRow } from '@pandazy/jankenstore-client-web';
 
 import { Card, CardContent, CardHeader, Typography } from '@mui/material';
-import { ReactElement, useState } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 
 export type RecordItem = {
 	show: TbdShow | SchemaDataRow;
@@ -16,7 +16,7 @@ export type RecordItem = {
 	videoUrl?: string;
 };
 
-export default function ImportToBeDecidedRecords({
+export default function UncertainRecords({
 	records,
 }: {
 	records: {
@@ -27,6 +27,12 @@ export default function ImportToBeDecidedRecords({
 	}[];
 }): ReactElement {
 	const [currentRecordNo, setCurrentRecordNo] = useState(0);
+
+	const currentRecord = records[currentRecordNo];
+
+	useEffect(() => {
+		setCurrentRecordNo(0);
+	}, [records.length]);
 
 	return (
 		<Card>
@@ -48,7 +54,7 @@ export default function ImportToBeDecidedRecords({
 					turnToPage={(page) => setCurrentRecordNo(page)}
 					totalPages={records.length}
 				/>
-				<UncertainBlock item={records[currentRecordNo]} />
+				{currentRecord && <UncertainBlock item={currentRecord} />}
 			</CardContent>
 		</Card>
 	);

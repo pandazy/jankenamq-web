@@ -54,12 +54,6 @@ export default function UncertainBlock({
 			(option: SchemaDataRow) => option.id === selectedArtistId,
 		);
 
-	console.log({
-		artist,
-		selectedArtistId,
-		selectedArtist,
-	});
-
 	return (
 		<Stack sx={{ width: 'fit-content' }}>
 			<Paper

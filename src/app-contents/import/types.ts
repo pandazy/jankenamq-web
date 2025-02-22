@@ -32,6 +32,7 @@ export interface TbdArtist {
 
 export interface TbdShow {
 	name: string;
+	name_romaji: string;
 	vintage: string;
 	$tbd?: boolean;
 	$tbd_options?: Array<SchemaDataRow>;
