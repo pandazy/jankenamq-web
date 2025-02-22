@@ -40,11 +40,11 @@ export default function CertainRecords({
 				/>
 			)}
 			<Stack spacing={2} sx={{ width: 'fit-content' }}>
-				<ShowRow show={show} />
 				<SongRow
 					song={song}
 					learning={learningOfSongsMap?.[song.id as string]}
 				/>
+				<ShowRow show={show} />
 				<ArtistRow artist={artist} />
 			</Stack>
 			{videoUrl && (
