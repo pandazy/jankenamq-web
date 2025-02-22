@@ -14,7 +14,7 @@ import { ReactElement, useState } from 'react';
 export default function DueLearningList(): ReactElement {
 	const limit = 10;
 	const [offset, setOffset] = useState(0);
-	const { data, isLoading } = useLearningQuery({
+	const { data, isFetching } = useLearningQuery({
 		queryFn: async () => dueLearning(limit, offset),
 		queryKeys: [offset, limit],
 	});
@@ -45,7 +45,7 @@ export default function DueLearningList(): ReactElement {
 			)}
 			<DataList
 				data={data?.records ?? []}
-				isLoading={isLoading}
+				isLoading={isFetching}
 				makeItemContent={(learning: SchemaDataRowParented) => {
 					return (
 						<SongRow

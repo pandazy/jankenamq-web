@@ -18,7 +18,7 @@ export default function ArtistPopCard({
 	artistId: string;
 	song?: SchemaDataRow;
 }) {
-	const { data, isLoading } = useSchemaQuery(
+	const { data, isFetching } = useSchemaQuery(
 		{
 			table: 'artist',
 			fillParent: true,
@@ -51,7 +51,7 @@ export default function ArtistPopCard({
 				</>
 			}
 			data={(data?.records ?? []) as SchemaDataRow[]}
-			isLoading={isLoading}
+			isLoading={isFetching}
 			makeItemContent={(item: SchemaDataRow) => (
 				<ArtistRow
 					artist={item}

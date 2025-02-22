@@ -14,15 +14,15 @@ export const RouteConf: {
 			avatar: <MusicNote />,
 			label: 'Home',
 		},
-		import: {
-			path: '/import',
-			avatar: <UploadFile />,
-			label: 'Import',
-		},
 		learn: {
 			path: '/learn',
 			avatar: <Psychology />,
 			label: 'Learn',
+		},
+		import: {
+			path: '/import',
+			avatar: <UploadFile />,
+			label: 'Import',
 		},
 	},
 	defaultRoute: 'home',

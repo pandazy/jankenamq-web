@@ -26,7 +26,7 @@ function commonBadgeProps(count: number): Omit<BadgeProps, 'children'> {
 }
 
 function SummaryBoard() {
-	const { data: summary, isLoading } = useQuery({
+	const { data: summary, isFetching: isLoadingSummary } = useQuery({
 		queryKey: [
 			QueryKeys.learning,
 			QueryKeys.artist,
@@ -36,7 +36,7 @@ function SummaryBoard() {
 		],
 		queryFn: () => learningSummary(),
 	});
-	const { data: totalDue, isLoading: totalDueLoading } = useQuery({
+	const { data: totalDue, isFetching: totalDueLoading } = useQuery({
 		queryKey: [QueryKeys.learning, 'totalDueLearning'],
 		queryFn: () => totalDueLearning(),
 		refetchInterval: 2000,
@@ -45,7 +45,9 @@ function SummaryBoard() {
 
 	return (
 		<Stack spacing={2}>
-			<AnimatedLoadingBar isLoading={isLoading || totalDueLoading} />
+			<AnimatedLoadingBar
+				isLoading={isLoadingSummary || totalDueLoading}
+			/>
 			<Stack direction="row" spacing={2}>
 				<Tooltip
 					title={
@@ -151,7 +153,7 @@ export default function Frame({
 			{children}
 			<Box sx={{ p: 20, display: 'flex' }} justifyContent="center">
 				<Typography variant="caption">
-					Copyright 2025 Jankenamq. All rights reserved.
+					This is the bottom of the page
 				</Typography>
 			</Box>
 		</>

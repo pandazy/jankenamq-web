@@ -14,15 +14,20 @@ import { Alert, Skeleton } from '@mui/material';
 
 import { ReactElement } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { AmqExportProvider } from './import/AmqExportContext';
 
 const Routes: Record<RouteType, ReactElement> = {
 	home: <EntryHome />,
 	learn: <EntryLearn />,
-	import: <EntryImport />,
+	import: (
+		<AmqExportProvider>
+			<EntryImport />
+		</AmqExportProvider>
+	),
 };
 
 export default function Routing(): ReactElement {
-	const { data: schemaData, isLoading } = useQuery({
+	const { data: schemaData, isFetching: isLoadingSchema } = useQuery({
 		queryKey: ['schema'],
 		queryFn: async () => schema(),
 	});
@@ -41,7 +46,7 @@ export default function Routing(): ReactElement {
 			}),
 		},
 	]);
-	return isLoading ? (
+	return isLoadingSchema ? (
 		<Skeleton />
 	) : (
 		<>

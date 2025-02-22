@@ -152,7 +152,7 @@ export function useLearningQuery({
 			enabled,
 		},
 	);
-	const { data: learningList, isLoading: isLoadingLearning } =
+	const { data: learningList, isFetching: isLoadingLearning } =
 		learningQueryResults;
 	const songs =
 		learningList?.records.map(
@@ -165,12 +165,13 @@ export function useLearningQuery({
 		queryFn: async () => byIds('artist', artistIds as string[]),
 		enabled: artistIds.length > 0 && !isLoadingLearning,
 	});
-	const { data: artistData, isLoading: isArtistLoading } = artistResults;
+	const { data: artistData, isFetching: isArtistLoading } = artistResults;
 	if (isLoadingLearning || isArtistLoading || artistIds.length === 0) {
 		return {
-			...learningQueryResults,
 			...artistResults,
-			isLoading: isLoadingLearning || isArtistLoading,
+			...learningQueryResults,
+			data: undefined,
+			isFetching: isLoadingLearning || isArtistLoading,
 		} as unknown as UseQueryResult<RecordsWithTotal<SchemaDataRowParented>>;
 	}
 	const artistMap = artistData?.records.reduce((acc, artist) => {
@@ -208,6 +209,7 @@ export function useLearningQuery({
 			records: parentedLearningList,
 			total: learningList?.total,
 		},
+		isFetching: isLoadingLearning || isArtistLoading,
 	} as unknown as UseQueryResult<RecordsWithTotal<SchemaDataRowParented>>;
 }
 

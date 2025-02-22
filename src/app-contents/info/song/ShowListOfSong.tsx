@@ -22,7 +22,7 @@ export default function ShowListOfSong({
 }) {
 	const limit = 5;
 	const [offset, setOffset] = useState(0);
-	const { data, isLoading } = useQuery({
+	const { data, isFetching } = useQuery({
 		queryKey: [QueryKeys.show, QueryKeys.song, song.id],
 		queryFn: () =>
 			peers(
@@ -64,7 +64,7 @@ export default function ShowListOfSong({
 				</>
 			}
 			data={data?.records ?? []}
-			isLoading={isLoading}
+			isLoading={isFetching}
 			makeItemContent={(item: SchemaDataRowParented) => (
 				<ShowRow
 					show={item as SchemaDataRow}

@@ -3,4 +3,5 @@ export const QueryKeys = {
 	show: 'show',
 	song: 'song',
 	learning: 'learning',
+	existing: 'existing',
 };

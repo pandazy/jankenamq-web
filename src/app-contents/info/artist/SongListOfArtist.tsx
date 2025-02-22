@@ -30,7 +30,7 @@ export default function SongListOfArtist({
 	);
 	const limit = 5;
 	const [offset, setOffset] = useState(0);
-	const { data, isLoading } = useQuery({
+	const { data, isFetching } = useQuery({
 		queryKey: [QueryKeys.artist, QueryKeys.song, pk ?? '', limit, offset],
 		queryFn: () => children('song', 'artist', [pk ?? ''], limit, offset),
 		enabled: !hasError,
@@ -78,7 +78,7 @@ export default function SongListOfArtist({
 					sx: { height: 'fit-content' },
 				}}
 			>
-				<AnimatedLoadingBar isLoading={isLoading} />
+				<AnimatedLoadingBar isLoading={isFetching} />
 				<SongList
 					songs={data?.records ?? []}
 					from={['artist', artist]}

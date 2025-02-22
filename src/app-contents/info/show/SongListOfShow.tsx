@@ -12,7 +12,7 @@ import { QueryKeys } from '../query-keys';
 
 export default function SongListOfShow({ show }: { show: SchemaDataRow }) {
 	const { pk: showPk } = useSchemaPk<string>('show', show as SchemaDataRow);
-	const { data, isLoading } = useSchemaQuery(
+	const { data, isFetching } = useSchemaQuery(
 		{
 			table: 'song',
 			fillParent: true,
@@ -35,7 +35,7 @@ export default function SongListOfShow({ show }: { show: SchemaDataRow }) {
 					</>
 				}
 			>
-				<AnimatedLoadingBar isLoading={isLoading} />
+				<AnimatedLoadingBar isLoading={isFetching} />
 				<SongList songs={data?.records ?? []} from={['show', show]} />
 			</PopCard>
 		</>

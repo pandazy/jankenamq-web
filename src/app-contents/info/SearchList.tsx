@@ -28,7 +28,7 @@ export function SearchList({
 	const queryFn = keyword.trim()
 		? async () => search({ table, keyword, col, exact }, limit, offset)
 		: async () => all(table, limit, offset);
-	const { data, isLoading } = useSchemaQuery(
+	const { data, isFetching } = useSchemaQuery(
 		{
 			table,
 			fillParent: true,
@@ -62,7 +62,7 @@ export function SearchList({
 			{sourceType != 'song' && (
 				<DataList
 					data={(data?.records ?? []) as SchemaDataRow[]}
-					isLoading={isLoading}
+					isLoading={isFetching}
 					makeItemContent={makeCell}
 				/>
 			)}

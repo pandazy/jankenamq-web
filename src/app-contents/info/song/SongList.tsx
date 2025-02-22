@@ -16,7 +16,7 @@ export default function SongList({
 	const songIds = songs.map(
 		(song) => song[pkField('song').unwrap()],
 	) as string[];
-	const { data: learningMap, isLoading: learningIsLoading } =
+	const { data: learningMap, isFetching: learningIsLoading } =
 		useLearningOfSongsMap(songIds);
 
 	return (
