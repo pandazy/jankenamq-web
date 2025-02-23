@@ -5,6 +5,7 @@ const QUERY_CLIENT = new QueryClient({
 	defaultOptions: {
 		queries: {
 			retry: false,
+			refetchOnWindowFocus: false,
 		},
 	},
 });
