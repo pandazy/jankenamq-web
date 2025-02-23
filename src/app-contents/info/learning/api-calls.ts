@@ -18,6 +18,7 @@ import {
 	useQueryClient,
 	UseQueryResult,
 } from '@tanstack/react-query';
+import { getMediaUrlMap } from '../song/api-calls';
 
 export async function allLearnings({
 	orderBy = 'level,created_at desc',
@@ -165,8 +166,19 @@ export function useLearningQuery({
 		queryFn: async () => byIds('artist', artistIds as string[]),
 		enabled: artistIds.length > 0 && !isLoadingLearning,
 	});
+	const { data: mediaUrlMap, isFetching: isMediaUrlLoading } = useQuery({
+		queryKey: ['media_url_map', songs.map((song) => song.id)],
+		queryFn: async () =>
+			getMediaUrlMap(songs.map((song) => song.id as string)),
+		enabled: songs.length > 0 && !isLoadingLearning,
+	});
 	const { data: artistData, isFetching: isArtistLoading } = artistResults;
-	if (isLoadingLearning || isArtistLoading || artistIds.length === 0) {
+	if (
+		isLoadingLearning ||
+		isMediaUrlLoading ||
+		isArtistLoading ||
+		artistIds.length === 0
+	) {
 		return {
 			...artistResults,
 			...learningQueryResults,
@@ -197,6 +209,7 @@ export function useLearningQuery({
 							...songArtistMap?.[existingSong.id as string],
 						},
 					},
+					$media_urls: mediaUrlMap?.[existingSong.id as string],
 				},
 			},
 		};

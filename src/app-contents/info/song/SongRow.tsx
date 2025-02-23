@@ -6,7 +6,13 @@ import { SchemaDataRowParented } from '~/app-contents/api-calls';
 import { getRandomColor } from '~/app-contents/utils';
 import { DefaultTooltipProps } from '~/app-contents/utils-component';
 
-import { Movie, MusicNote, Person, YouTube } from '@mui/icons-material';
+import {
+	Movie,
+	MusicNote,
+	Person,
+	VideoFile,
+	YouTube,
+} from '@mui/icons-material';
 
 import {
 	Piece,
@@ -26,9 +32,15 @@ export interface SongRowProps {
 	song: SchemaDataRowParented;
 	from?: ['artist' | 'show', SchemaDataRowParented];
 	learning?: SchemaDataRowParented;
+	media_urls?: string[];
 }
 
-export default function SongRow({ song, from, learning }: SongRowProps) {
+export default function SongRow({
+	song,
+	from,
+	learning,
+	media_urls,
+}: SongRowProps) {
 	const [relatedType, related] = from ?? [];
 	const getYoutubeSearchQuery = () =>
 		`https://www.youtube.com/results?search_query=${encodeURIComponent(
@@ -129,6 +141,22 @@ export default function SongRow({ song, from, learning }: SongRowProps) {
 							<Movie /> + <MusicNote /> =&gt; <YouTube />
 						</IconButton>
 					</Tooltip>
+				)}
+
+				{(media_urls?.length ?? 0) > 0 && (
+					<Stack direction="row" spacing={2}>
+						{media_urls?.map((url) => (
+							<IconButton
+								key={url}
+								component="a"
+								href={url}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								<VideoFile />
+							</IconButton>
+						))}
+					</Stack>
 				)}
 			</Stack>
 		</Stack>

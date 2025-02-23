@@ -52,6 +52,10 @@ export default function AllLearningList(): ReactElement {
 								learning.$parents?.song as SchemaDataRowParented
 							}
 							learning={learning}
+							media_urls={
+								learning.$parents?.song
+									?.$media_urls as unknown as string[]
+							}
 						/>
 					);
 				}}
