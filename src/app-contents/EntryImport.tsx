@@ -105,10 +105,6 @@ export default function EntryImport(): ReactElement {
 	const { updateAmqExport, amqExport, dupArtistIdMap, clearAmqExport } =
 		useAmqExportContext();
 
-	console.log({
-		dupArtistIdMap,
-	});
-
 	const [dragActive, setDragActive] = useState(false);
 
 	const handleDrag = (e: React.DragEvent) => {
