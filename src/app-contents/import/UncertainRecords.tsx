@@ -6,25 +6,23 @@ import { Paginator } from '~/app-contents/info/Paginator';
 
 import { SchemaDataRow } from '@pandazy/jankenstore-client-web';
 
-import { Card, CardContent, CardHeader, Typography } from '@mui/material';
-import { ReactElement, useEffect, useState } from 'react';
+import { Card, CardContent, CardHeader } from '@mui/material';
+import { ReactElement, ReactNode, useEffect, useState } from 'react';
 
 export type RecordItem = {
 	show: TbdShow | SchemaDataRow;
 	song: TbdSong | SchemaDataRow;
 	artist: TbdArtist | SchemaDataRow;
 	videoUrl?: string;
+
 };
 
 export default function UncertainRecords({
 	records,
+	title,
 }: {
-	records: {
-		show: TbdShow | SchemaDataRow;
-		song: TbdSong | SchemaDataRow;
-		artist: TbdArtist | SchemaDataRow;
-		videoUrl?: string;
-	}[];
+	title?: ReactNode,
+	records: RecordItem[];
 }): ReactElement {
 	const [currentRecordNo, setCurrentRecordNo] = useState(0);
 
@@ -41,11 +39,7 @@ export default function UncertainRecords({
 					backgroundColor: 'warning.main',
 					color: 'white',
 				}}
-				title={
-					<Typography fontWeight={600}>
-						Further actions required for records in this card:
-					</Typography>
-				}
+				title={title}
 			/>
 			<CardContent>
 				<Paginator

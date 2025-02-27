@@ -24,9 +24,13 @@ import {
 	Paper,
 } from '@mui/material';
 import {
+	ArrowUpward,
 	AttachFileTwoTone,
 	Block,
+	CheckCircleTwoTone,
 	Delete,
+	ErrorTwoTone,
+	ExplicitSharp,
 	TipsAndUpdatesTwoTone,
 } from '@mui/icons-material';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -157,6 +161,48 @@ export default function EntryImport(): ReactElement {
 	const uncertainRecords = importCheck?.uncertainRecords ?? [];
 	const certainRecords = importCheck?.certainRecords ?? [];
 
+	const progress =
+		(certainRecords.length /
+			(certainRecords.length + uncertainRecords.length)) *
+		100;
+
+	const progressDisplay = (
+		<Box sx={{ position: 'relative', display: 'inline-flex' }}>
+			<CircularProgress
+				size={64}
+				color="info"
+				sx={{
+					mr: 1,
+					color: 'white',
+				}}
+				variant="determinate"
+				thickness={5}
+				value={progress}
+			/>
+			<Box
+				sx={{
+					top: 0,
+					left: 0,
+					bottom: 0,
+					right: 0,
+					position: 'absolute',
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+				}}
+			>
+				<Typography
+					variant="caption"
+					component="div"
+					color="white"
+					sx={{ fontWeight: 'bold' }}
+				>
+					{progress}%
+				</Typography>
+			</Box>
+		</Box>
+	);
+
 	return (
 		<Frame forRoute="import">
 			<Typography variant="h3">
@@ -262,7 +308,18 @@ export default function EntryImport(): ReactElement {
 					/>
 
 					{uncertainRecords.length > 0 && (
-						<UncertainRecords records={uncertainRecords} />
+						<UncertainRecords
+							records={uncertainRecords}
+							title={
+								<Stack direction="row" alignItems="center">
+									{progressDisplay}
+									<Typography fontWeight={600}>
+										Further actions required for records in
+										this card:
+									</Typography>
+								</Stack>
+							}
+						/>
 					)}
 					{certainRecords.length > 0 && (
 						<Card>
@@ -278,30 +335,24 @@ export default function EntryImport(): ReactElement {
 												direction="row"
 												alignItems="center"
 											>
-												<CircularProgress
-													size={32}
-													color="info"
-													sx={{
-														mr: 1,
-														color: 'white',
-													}}
-													variant="determinate"
-													thickness={10}
-													value={
-														(certainRecords.length /
-															(certainRecords.length +
-																uncertainRecords.length)) *
-														100
-													}
-												/>
 												{uncertainRecords.length > 0 ? (
 													<>
-														Before going any
-														further, address the
-														issues above{' '}
+														<ErrorTwoTone
+															sx={{ mr: 1 }}
+														/>
+														Address the issues above{' '}
+														<ArrowUpward
+															sx={{ ml: 1 }}
+														/>
 													</>
 												) : (
-													"Let's add these records to Play History!"
+													<>
+														<CheckCircleTwoTone
+															sx={{ mr: 1 }}
+														/>
+														Let's add these records
+														to Play History!
+													</>
 												)}
 											</Stack>
 										</Typography>
