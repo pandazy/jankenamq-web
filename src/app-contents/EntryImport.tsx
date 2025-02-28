@@ -30,7 +30,6 @@ import {
 	CheckCircleTwoTone,
 	Delete,
 	ErrorTwoTone,
-	ExplicitSharp,
 	TipsAndUpdatesTwoTone,
 } from '@mui/icons-material';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -162,9 +161,12 @@ export default function EntryImport(): ReactElement {
 	const certainRecords = importCheck?.certainRecords ?? [];
 
 	const progress =
-		(certainRecords.length /
-			(certainRecords.length + uncertainRecords.length)) *
-		100;
+		Math.round(
+			(certainRecords.length /
+				(certainRecords.length + uncertainRecords.length)) *
+				100 *
+				10,
+		) / 10;
 
 	const progressDisplay = (
 		<Box sx={{ position: 'relative', display: 'inline-flex' }}>
