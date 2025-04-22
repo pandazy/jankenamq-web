@@ -9,8 +9,9 @@ import {
 	SchemaDataRow,
 } from '@pandazy/jankenstore-client-web';
 
-import { Paper, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import { useState } from 'react';
+import VideoPanel from './VideoPanel';
 
 export default function CertainRecords({
 	records,
@@ -47,15 +48,7 @@ export default function CertainRecords({
 				<ShowRow show={show} />
 				<ArtistRow artist={artist} />
 			</Stack>
-			{videoUrl && (
-				<Paper sx={{ width: 'fit-content' }} elevation={4}>
-					<video
-						src={videoUrl}
-						controls
-						style={{ maxWidth: '500px' }}
-					/>
-				</Paper>
-			)}
+			{videoUrl && <VideoPanel videoUrl={videoUrl} />}
 		</Stack>
 	);
 }

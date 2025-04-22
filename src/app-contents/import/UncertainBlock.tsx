@@ -21,6 +21,7 @@ import AddArtistButton from './AddArtistButton';
 import AddShowButton from './AddShowButton';
 import AddSongButton from './AddSongButton';
 import { useAmqExportContext } from './AmqExportContext';
+import VideoPanel from './VideoPanel';
 
 const getPaperSx = (tbd: boolean) => ({
 	p: 1,
@@ -193,17 +194,7 @@ export default function UncertainBlock({
 					</Stack>
 				)}
 			</Paper>
-			{videoUrl && (
-				<Paper elevation={4} sx={getPaperSx(false)}>
-					{videoUrl && (
-						<video
-							style={{ maxHeight: '500px' }}
-							src={videoUrl}
-							controls
-						/>
-					)}
-				</Paper>
-			)}
+			{videoUrl && <VideoPanel videoUrl={videoUrl} />}
 		</Stack>
 	);
 }
